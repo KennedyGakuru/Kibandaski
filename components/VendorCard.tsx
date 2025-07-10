@@ -1,8 +1,8 @@
 import { View, Text, TouchableOpacity, ScrollView, Alert, Modal, TextInput } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
-import { X, Star, MapPin, Phone, Heart } from 'lucide-react-native';
 import { useState, useEffect } from 'react';
 import { supabase, useAuth } from '../contexts/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 interface Vendor {
   id: string;
@@ -180,14 +180,14 @@ export function VendorCard({ vendor, onClose }: VendorCardProps) {
             </Text>
             <View className="flex-row items-center gap-2">
               <TouchableOpacity onPress={toggleFavorite} className="p-2">
-                <Heart 
+                <Ionicons name="heart" 
                   size={24} 
                   color={isFavorite ? '#ef4444' : (isDark ? '#9ca3af' : '#6b7280')} 
                   fill={isFavorite ? '#ef4444' : 'none'}
                 />
               </TouchableOpacity>
               <TouchableOpacity onPress={onClose} className="p-2" testID="close-button">
-                <X size={24} color={isDark ? '#ffffff' : '#374151'} />
+                <Ionicons name="close" size={24} color={isDark ? '#ffffff' : '#374151'} />
               </TouchableOpacity>
             </View>
           </View>
@@ -198,7 +198,7 @@ export function VendorCard({ vendor, onClose }: VendorCardProps) {
 
           <View className="flex-row items-center gap-4 mb-4">
             <View className="flex-row items-center">
-              <Star size={16} color="#f59e0b" fill="#f59e0b" />
+              <Ionicons name="star" size={16} color="#f59e0b" fill="#f59e0b" />
               <Text className={`text-sm font-medium ml-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 {vendor.rating.toFixed(1)}
               </Text>
@@ -223,14 +223,14 @@ export function VendorCard({ vendor, onClose }: VendorCardProps) {
 
           <View className="flex-row items-center gap-4">
             <View className="flex-row items-center">
-              <MapPin size={16} color={isDark ? '#9ca3af' : '#6b7280'} />
+              <Ionicons name="locate" size={16} color={isDark ? '#9ca3af' : '#6b7280'} />
               <Text className={`text-sm ml-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 {vendor.address}
               </Text>
             </View>
             {vendor.phone && (
               <View className="flex-row items-center">
-                <Phone size={16} color={isDark ? '#9ca3af' : '#6b7280'} />
+                <Ionicons name="call" size={16} color={isDark ? '#9ca3af' : '#6b7280'} />
                 <Text className={`text-sm ml-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                   {vendor.phone}
                 </Text>
@@ -323,7 +323,7 @@ export function VendorCard({ vendor, onClose }: VendorCardProps) {
               Rate {vendor.name}
             </Text>
             <TouchableOpacity onPress={() => setShowRatingModal(false)} testID="favorite-button">
-              <X size={24} color={isDark ? '#ffffff' : '#374151'} />
+              <Ionicons name='close' size={24} color={isDark ? '#ffffff' : '#374151'} />
             </TouchableOpacity>
           </View>
 
@@ -334,7 +334,7 @@ export function VendorCard({ vendor, onClose }: VendorCardProps) {
             <View className="flex-row gap-2">
               {[1, 2, 3, 4, 5].map((star) => (
                 <TouchableOpacity key={star} onPress={() => setRating(star)}>
-                  <Star 
+                  <Ionicons name="star" 
                     size={40} 
                     color="#f59e0b" 
                     fill={star <= rating ? "#f59e0b" : "none"} 

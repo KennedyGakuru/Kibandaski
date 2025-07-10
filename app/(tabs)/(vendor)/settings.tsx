@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'reac
 import { useAuth } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { router } from 'expo-router';
-import { ArrowLeft, Save, Store, Mail, Phone, MapPin } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function VendorSettingsScreen() {
   const { user, updateProfile } = useAuth();
@@ -53,7 +53,7 @@ export default function VendorSettingsScreen() {
           onPress={() => router.back()}
           className="p-2"
         >
-          <ArrowLeft size={24} color={isDark ? '#ffffff' : '#374151'} />
+          <Ionicons name='chevron-back' size={24} color={isDark ? '#ffffff' : '#374151'} />
         </TouchableOpacity>
         <Text className={`text-xl font-bold flex-1 text-center mx-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
           Business Settings
@@ -63,7 +63,7 @@ export default function VendorSettingsScreen() {
           className="p-2 rounded-full bg-orange-500"
           disabled={loading}
         >
-          <Save size={20} color="white" />
+          <Ionicons name="save" size={20} color="white" />
         </TouchableOpacity>
       </View>
 
@@ -78,7 +78,7 @@ export default function VendorSettingsScreen() {
               Business Name
             </Text>
             <View className="flex-row items-center rounded-xl px-4 py-1">
-              <Store size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+              <Ionicons name="storefront" size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
               <TextInput
                 className={`flex-1 text-base py-3 pl-3 rounded ${isDark ? 'text-white bg-gray-700' : 'text-gray-900 bg-gray-50'}`}
                 placeholder="Enter your business name"
@@ -94,7 +94,7 @@ export default function VendorSettingsScreen() {
               Email Address
             </Text>
             <View className="flex-row items-center rounded-xl px-4 py-1">
-              <Mail size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+              <Ionicons name="mail" size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
               <TextInput
                 className={`flex-1 text-base py-3 pl-3 rounded ${isDark ? 'text-white bg-gray-700' : 'text-gray-900 bg-gray-50'}`}
                 placeholder="Enter your email"
@@ -112,7 +112,7 @@ export default function VendorSettingsScreen() {
               Phone Number
             </Text>
             <View className="flex-row items-center rounded-xl px-4 py-1">
-              <Phone size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+              <Ionicons name='call' size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
               <TextInput
                 className={`flex-1 text-base py-3 pl-3 rounded ${isDark ? 'text-white bg-gray-700' : 'text-gray-900 bg-gray-50'}`}
                 placeholder="Enter your phone number"
@@ -129,7 +129,7 @@ export default function VendorSettingsScreen() {
               Business Address
             </Text>
             <View className="flex-row items-start rounded-xl px-4 py-1">
-              <MapPin size={20} color={isDark ? '#9ca3af' : '#6b7280'} className="mt-3" />
+              <Ionicons name="locate" size={20} color={isDark ? '#9ca3af' : '#6b7280'} className="mt-3" />
               <TextInput
                 className={`flex-1 text-base py-3 pl-3 rounded min-h-20 ${isDark ? 'text-white bg-gray-700' : 'text-gray-900 bg-gray-50'}`}
                 placeholder="Enter your business address"
@@ -166,7 +166,7 @@ export default function VendorSettingsScreen() {
           onPress={handleSave}
           disabled={loading}
         >
-          <Save size={20} color="white" />
+          <Ionicons name="save" size={20} color="white" />
           <Text className="text-lg font-bold text-white">
             {loading ? 'Saving...' : 'Save Changes'}
           </Text>

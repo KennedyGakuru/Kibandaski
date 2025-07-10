@@ -1,10 +1,10 @@
 import { useState, useEffect } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, Image, StyleSheet, Dimensions } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
-import { Star, MapPin, Clock } from 'lucide-react-native';
 import { supabase } from '../contexts/AuthContext';
 import { SkeletonCard } from './SkeletonCard';
 import { FeaturedVendor } from '@/types';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width: screenWidth } = Dimensions.get('window');
 const cardWidth = screenWidth * 0.85;
@@ -145,7 +145,7 @@ export function FeaturedHiddenGems({ onVendorPress }: FeaturedHiddenGemsProps) {
               </Text>
               
               <View style={styles.locationRow}>
-                <MapPin size={14} color={isDark ? '#9ca3af' : '#6b7280'} />
+                <Ionicons name="locate" size={14} color={isDark ? '#9ca3af' : '#6b7280'} />
                 <Text style={[styles.locationText, { color: isDark ? '#9ca3af' : '#6b7280' }]}>
                   {featuredVendor.vendors.address}
                 </Text>
@@ -157,7 +157,7 @@ export function FeaturedHiddenGems({ onVendorPress }: FeaturedHiddenGemsProps) {
               
               <View style={styles.cardFooter}>
                 <View style={styles.ratingContainer}>
-                  <Star size={16} color="#f59e0b" fill="#f59e0b" />
+                  <Ionicons name="star" size={16} color="#f59e0b" fill="#f59e0b" />
                   <Text style={[styles.ratingText, { color: isDark ? '#ffffff' : '#111827' }]}>
                     {featuredVendor.vendors.rating.toFixed(1)}
                   </Text>
@@ -167,7 +167,7 @@ export function FeaturedHiddenGems({ onVendorPress }: FeaturedHiddenGemsProps) {
                 </View>
                 
                 <View style={styles.timeContainer}>
-                  <Clock size={14} color={isDark ? '#9ca3af' : '#6b7280'} />
+                  <Ionicons name="time" size={14} color={isDark ? '#9ca3af' : '#6b7280'} />
                   <Text style={[styles.timeText, { color: isDark ? '#9ca3af' : '#6b7280' }]}>
                     15-20 min
                   </Text>

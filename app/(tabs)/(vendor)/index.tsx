@@ -3,8 +3,8 @@ import { View, Text, ScrollView, TouchableOpacity, Switch } from 'react-native';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { router } from 'expo-router';
-import { Store, MapPin, Star, Settings, Plus, TrendingUp, Users, DollarSign } from 'lucide-react-native';
 import { supabase } from '../../../contexts/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 interface Vendor {
   id: string;
@@ -153,7 +153,7 @@ export default function VendorDashboardScreen() {
   if (!vendor) {
     return (
       <View className={`flex-1 justify-center items-center px-8 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
-        <Store size={64} color={isDark ? '#6b7280' : '#d1d5db'} />
+        <Ionicons name="storefront" size={64} color={isDark ? '#6b7280' : '#d1d5db'} />
         <Text className={`text-2xl font-bold mt-4 text-center ${isDark ? 'text-white' : 'text-gray-900'}`}>
           Set Up Your Business
         </Text>
@@ -181,7 +181,7 @@ export default function VendorDashboardScreen() {
             className="p-2"
             onPress={() => router.push('/(tabs)/(vendor)/settings')}
           >
-            <Settings size={24} color={isDark ? '#ffffff' : '#374151'} />
+            <Ionicons name="settings" size={24} color={isDark ? '#ffffff' : '#374151'} />
           </TouchableOpacity>
         </View>
         <Text className={`text-base ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -194,7 +194,7 @@ export default function VendorDashboardScreen() {
         <View className={`rounded-xl p-6 mb-6 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
           <View className="flex-row items-center justify-between mb-4">
             <View className="flex-row items-center">
-              <Store size={24} color={isDark ? '#ffffff' : '#374151'} />
+              <Ionicons name='storefront' size={24} color={isDark ? '#ffffff' : '#374151'} />
               <Text className={`text-lg font-bold ml-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 Business Status
               </Text>
@@ -215,7 +215,7 @@ export default function VendorDashboardScreen() {
         <View className="flex-row flex-wrap gap-4 mb-6">
           <View className={`flex-1 min-w-[45%] rounded-xl p-4 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
             <View className="flex-row items-center mb-2">
-              <DollarSign size={20} color="#22c55e" />
+              <Ionicons name="logo-usd" size={20} color="#22c55e" />
               <Text className={`text-sm font-medium ml-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Revenue
               </Text>
@@ -227,7 +227,7 @@ export default function VendorDashboardScreen() {
 
           <View className={`flex-1 min-w-[45%] rounded-xl p-4 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
             <View className="flex-row items-center mb-2">
-              <Users size={20} color="#3b82f6" />
+              <Ionicons name="person" size={20} color="#3b82f6" />
               <Text className={`text-sm font-medium ml-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Orders
               </Text>
@@ -239,7 +239,7 @@ export default function VendorDashboardScreen() {
 
           <View className={`flex-1 min-w-[45%] rounded-xl p-4 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
             <View className="flex-row items-center mb-2">
-              <Star size={20} color="#f59e0b" />
+              <Ionicons name="star" size={20} color="#f59e0b" />
               <Text className={`text-sm font-medium ml-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Rating
               </Text>
@@ -251,7 +251,7 @@ export default function VendorDashboardScreen() {
 
           <View className={`flex-1 min-w-[45%] rounded-xl p-4 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
             <View className="flex-row items-center mb-2">
-              <MapPin size={20} color="#8b5cf6" />
+              <Ionicons name="locate" size={20} color="#8b5cf6" />
               <Text className={`text-sm font-medium ml-2 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 Menu Items
               </Text>
@@ -273,7 +273,7 @@ export default function VendorDashboardScreen() {
               className={`flex-1 items-center p-4 rounded-xl gap-2 ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}
               onPress={() => router.push('/(tabs)/(vendor)/menu')}
             >
-              <Plus size={24} color="#f97316" />
+              <Ionicons name="add" size={24} color="#f97316" />
               <Text className={`text-sm font-medium text-center ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 Manage Menu
               </Text>
@@ -283,7 +283,7 @@ export default function VendorDashboardScreen() {
               className={`flex-1 items-center p-4 rounded-xl gap-2 ${isDark ? 'bg-gray-700' : 'bg-gray-50'}`}
               onPress={() => router.push('/(tabs)/(vendor)/analytics')}
             >
-              <TrendingUp size={24} color="#3b82f6" />
+              <Ionicons name="stats-chart" size={24} color="#3b82f6" />
               <Text className={`text-sm font-medium text-center ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 View Analytics
               </Text>
@@ -298,7 +298,7 @@ export default function VendorDashboardScreen() {
           </Text>
           
           <View className="flex-row items-center mb-2 gap-2">
-            <MapPin size={16} color={isDark ? '#9ca3af' : '#6b7280'} />
+            <Ionicons name="locate" size={16} color={isDark ? '#9ca3af' : '#6b7280'} />
             <Text className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               {vendor.address}
             </Text>

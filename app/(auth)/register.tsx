@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Alert, ScrollView, KeyboardAvo
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../contexts/AuthContext';
-import { ArrowLeft, Eye, EyeOff, User, Store, Mail, Lock } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Register() {
   const [email, setEmail] = useState('');
@@ -100,7 +100,7 @@ export default function Register() {
             onPress={() => router.back()}
             className="absolute top-12 left-6 z-10 p-2"
           >
-            <ArrowLeft size={24} color="white" />
+            <Ionicons name='chevron-back' size={24} color="white" />
           </TouchableOpacity>
 
           <View className="items-center mb-10 mt-8">
@@ -121,7 +121,7 @@ export default function Register() {
               <View className={`flex-row items-center bg-white/15 rounded-2xl px-4 py-1 border-2 ${
                 focusedField === 'name' ? 'bg-white/25 border-white/50' : 'border-transparent'
               }`}>
-                <User size={20} color={focusedField === 'name' ? '#f97316' : 'rgba(255,255,255,0.7)'} />
+                <Ionicons name='person' size={20} color={focusedField === 'name' ? '#f97316' : 'rgba(255,255,255,0.7)'} />
                 <TextInput
                   className="flex-1 text-white text-base py-4 pl-3"
                   placeholder="Enter your full name"
@@ -144,7 +144,7 @@ export default function Register() {
               <View className={`flex-row items-center bg-white/15 rounded-2xl px-4 py-1 border-2 ${
                 focusedField === 'email' ? 'bg-white/25 border-white/50' : 'border-transparent'
               }`}>
-                <Mail size={20} color={focusedField === 'email' ? '#f97316' : 'rgba(255,255,255,0.7)'} />
+                <Ionicons name="mail" size={20} color={focusedField === 'email' ? '#f97316' : 'rgba(255,255,255,0.7)'} />
                 <TextInput
                   className="flex-1 text-white text-base py-4 pl-3"
                   placeholder="Enter your email"
@@ -169,7 +169,7 @@ export default function Register() {
               <View className={`flex-row items-center bg-white/15 rounded-2xl px-4 py-1 border-2 ${
                 focusedField === 'password' ? 'bg-white/25 border-white/50' : 'border-transparent'
               }`}>
-                <Lock size={20} color={focusedField === 'password' ? '#f97316' : 'rgba(255,255,255,0.7)'} />
+                <Ionicons name="lock-closed" size={20} color={focusedField === 'password' ? '#f97316' : 'rgba(255,255,255,0.7)'} />
                 <TextInput
                   className="flex-1 text-white text-base py-4 pl-3"
                   placeholder="Enter your password (min 6 characters)"
@@ -186,9 +186,9 @@ export default function Register() {
                   className="p-2"
                 >
                   {showPassword ? (
-                    <EyeOff size={20} color="rgba(255,255,255,0.7)" />
+                    <Ionicons name="eye-off" size={20} color="rgba(255,255,255,0.7)" />
                   ) : (
-                    <Eye size={20} color="rgba(255,255,255,0.7)" />
+                    <Ionicons name="eye" size={20} color="rgba(255,255,255,0.7)" />
                   )}
                 </TouchableOpacity>
               </View>
@@ -202,7 +202,7 @@ export default function Register() {
               <View className={`flex-row items-center bg-white/15 rounded-2xl px-4 py-1 border-2 ${
                 focusedField === 'confirmPassword' ? 'bg-white/25 border-white/50' : 'border-transparent'
               }`}>
-                <Lock size={20} color={focusedField === 'confirmPassword' ? '#f97316' : 'rgba(255,255,255,0.7)'} />
+                <Ionicons name="lock-closed" size={20} color={focusedField === 'confirmPassword' ? '#f97316' : 'rgba(255,255,255,0.7)'} />
                 <TextInput
                   className="flex-1 text-white text-base py-4 pl-3"
                   placeholder="Confirm your password"
@@ -219,9 +219,9 @@ export default function Register() {
                   className="p-2"
                 >
                   {showConfirmPassword ? (
-                    <EyeOff size={20} color="rgba(255,255,255,0.7)" />
+                    <Ionicons name="eye-off" size={20} color="rgba(255,255,255,0.7)" />
                   ) : (
-                    <Eye size={20} color="rgba(255,255,255,0.7)" />
+                    <Ionicons name="eye" size={20} color="rgba(255,255,255,0.7)" />
                   )}
                 </TouchableOpacity>
               </View>
@@ -241,7 +241,7 @@ export default function Register() {
                   }`}
                   onPress={() => setUserType('customer')}
                 >
-                  <User size={20} color={userType === 'customer' ? '#f97316' : 'white'} />
+                  <Ionicons name="person" size={20} color={userType === 'customer' ? '#f97316' : 'white'} />
                   <Text className={`text-center font-semibold text-base ${
                     userType === 'customer' ? 'text-orange-500' : 'text-white'
                   }`}>
@@ -256,7 +256,7 @@ export default function Register() {
                   }`}
                   onPress={() => setUserType('vendor')}
                 >
-                  <Store size={20} color={userType === 'vendor' ? '#f97316' : 'white'} />
+                  <Ionicons name="storefront" size={20} color={userType === 'vendor' ? '#f97316' : 'white'} />
                   <Text className={`text-center font-semibold text-base ${
                     userType === 'vendor' ? 'text-orange-500' : 'text-white'
                   }`}>

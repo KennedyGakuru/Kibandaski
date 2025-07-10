@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { View, Text, FlatList, TouchableOpacity, Image, StyleSheet, RefreshControl, TextInput } from 'react-native';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
-import { Heart, MapPin, Star, Search, X } from 'lucide-react-native';
 import { supabase } from '../../../contexts/AuthContext';
 import { SkeletonCard } from '../../../components/SkeletonCard';
+import { Ionicons } from '@expo/vector-icons';
 
 interface Vendor {
   id: string;
@@ -140,7 +140,7 @@ export default function CustomerFavoritesScreen() {
               {item.name}
             </Text>
             <View className="flex-row items-center mt-1">
-              <MapPin size={14} color={isDark ? '#9ca3af' : '#6b7280'} />
+              <Ionicons name='locate' size={14} color={isDark ? '#9ca3af' : '#6b7280'} />
               <Text className={`text-sm ml-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                 {item.address}
               </Text>
@@ -151,7 +151,7 @@ export default function CustomerFavoritesScreen() {
             className="p-2"
             testID="remove-favorite-button"
           >
-            <Heart size={20} color="#ef4444" fill="#ef4444" />
+            <Ionicons name='heart' size={20} color="#ef4444" fill="#ef4444" />
           </TouchableOpacity>
         </View>
         
@@ -161,7 +161,7 @@ export default function CustomerFavoritesScreen() {
         
         <View className="flex-row items-center justify-between">
           <View className="flex-row items-center">
-            <Star size={16} color="#f59e0b" fill="#f59e0b" />
+            <Ionicons name='search' size={16} color="#f59e0b" fill="#f59e0b" />
             <Text className={`text-sm font-medium ml-1 ${isDark ? 'text-white' : 'text-gray-900'}`}>
               {item.rating.toFixed(1)}
             </Text>
@@ -207,7 +207,7 @@ export default function CustomerFavoritesScreen() {
           onPress={() => setShowSearch(!showSearch)}
           testID="search-button"
         >
-          <Search size={20} color={isDark ? '#ffffff' : '#374151'} />
+          <Ionicons name="search" size={20} color={isDark ? '#ffffff' : '#374151'} />
         </TouchableOpacity>
       </View>
 
@@ -215,7 +215,7 @@ export default function CustomerFavoritesScreen() {
       {showSearch && (
         <View className={`px-6 py-4 ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
           <View className={`flex-row items-center px-4 py-3 rounded-xl gap-3 ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
-            <Search size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+            <Ionicons name='search' size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
             <TextInput
               className={`flex-1 text-base ${isDark ? 'text-white' : 'text-gray-900'}`}
               placeholder="Search your favorites..."
@@ -226,7 +226,7 @@ export default function CustomerFavoritesScreen() {
             />
             {searchQuery.length > 0 && (
               <TouchableOpacity onPress={clearSearch}>
-                <X size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+                <Ionicons name='close' size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
               </TouchableOpacity>
             )}
           </View>
@@ -243,7 +243,7 @@ export default function CustomerFavoritesScreen() {
         />
       ) : filteredFavorites.length === 0 ? (
         <View className="flex-1 justify-center items-center px-8">
-          <Heart size={64} color={isDark ? '#4b5563' : '#d1d5db'} />
+          <Ionicons name='heart' size={64} color={isDark ? '#4b5563' : '#d1d5db'} />
           <Text className={`text-xl font-bold mt-4 text-center ${isDark ? 'text-white' : 'text-gray-900'}`}>
             {searchQuery ? 'No favorites found' : 'No favorites yet'}
           </Text>

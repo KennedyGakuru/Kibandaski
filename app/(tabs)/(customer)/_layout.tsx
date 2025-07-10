@@ -1,5 +1,5 @@
 import { Tabs } from 'expo-router';
-import { Ionicons } from '@expo/vector-icons'; // Updated import
+import { Ionicons } from '@expo/vector-icons'; 
 import { useTheme } from '@/contexts/ThemeContext';
 
 

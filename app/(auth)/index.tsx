@@ -3,7 +3,7 @@ import { router } from 'expo-router';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../contexts/AuthContext';
-import { MapPin, Users, Star } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function AuthHome() {
   const { user, loading } = useAuth();
@@ -29,7 +29,7 @@ export default function AuthHome() {
     >
       <View className="flex-1 justify-center items-center px-8">
         <View className="bg-white/20 p-6 rounded-full mb-8">
-          <MapPin size={64} color="white" />
+          <Ionicons name="location" size={64} color="white" />
         </View>
         
         <Text className="text-4xl font-bold text-white text-center mb-4">
@@ -42,19 +42,19 @@ export default function AuthHome() {
         <View className="flex-row justify-around w-full mb-12">
           <View className="items-center">
             <View className="bg-white/20 p-4 rounded-full mb-2">
-              <MapPin size={24} color="white" />
+              <Ionicons name="location" size={24} color="white" />
             </View>
             <Text className="text-white text-sm font-medium">Find Vendors</Text>
           </View>
           <View className="items-center">
             <View className="bg-white/20 p-4 rounded-full mb-2">
-              <Star size={24} color="white" />
+              <Ionicons name="star" size={24} color="white" />
             </View>
             <Text className="text-white text-sm font-medium">Rate & Review</Text>
           </View>
           <View className="items-center">
             <View className="bg-white/20 p-4 rounded-full mb-2">
-              <Users size={24} color="white" />
+              <Ionicons name="person" size={24} color="white" />
             </View>
             <Text className="text-white text-sm font-medium">Community</Text>
           </View>

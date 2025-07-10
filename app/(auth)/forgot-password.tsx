@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, Mail } from 'lucide-react-native';
 import { supabase } from '../../contexts/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ForgotPasswordScreen() {
   const [email, setEmail] = useState('');
@@ -59,11 +59,11 @@ export default function ForgotPasswordScreen() {
           onPress={() => router.back()}
           className="self-start mb-8"
         >
-          <ArrowLeft size={24} color="white" />
+          <Ionicons name="chevron-back" size={24} color="white" />
         </TouchableOpacity>
 
         <View className="bg-white/20 p-6 rounded-full mb-8">
-          <Mail size={64} color="white" />
+          <Ionicons name="mail" size={64} color="white" />
         </View>
 
         <Text className="text-3xl font-bold text-white mb-4 text-center">

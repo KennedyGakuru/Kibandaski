@@ -3,19 +3,8 @@ import { View, Text, ScrollView, TouchableOpacity, Dimensions } from 'react-nati
 import { useAuth } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { router } from 'expo-router';
-import { 
-  ArrowLeft, 
-  TrendingUp, 
-  TrendingDown, 
-  DollarSign, 
-  Users, 
-  Star, 
-  ShoppingBag,
-  Calendar,
-  Clock,
-  Award
-} from 'lucide-react-native';
 import { supabase } from '../../../contexts/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -267,7 +256,7 @@ export default function VendorAnalyticsScreen() {
             className="p-2"
             onPress={() => router.back()}
           >
-            <ArrowLeft size={24} color={isDark ? '#ffffff' : '#374151'} />
+            <Ionicons name='chevron-back' size={24} color={isDark ? '#ffffff' : '#374151'} />
           </TouchableOpacity>
           <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
             Analytics
@@ -302,9 +291,9 @@ export default function VendorAnalyticsScreen() {
         <View className="flex-row flex-wrap gap-4 mb-6">
           <View className={`flex-1 min-w-[45%] rounded-xl p-4 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
             <View className="flex-row justify-between items-center mb-2">
-              <DollarSign size={20} color="#22c55e" />
+              <Ionicons name='logo-usd' size={20} color="#22c55e" />
               <View className="flex-row items-center gap-1">
-                <TrendingUp size={16} color="#22c55e" />
+                <Ionicons name="stats-chart" size={16} color="#22c55e" />
                 <Text className="text-xs font-medium text-green-500">
                   +{analytics.revenue.growth.toFixed(1)}%
                 </Text>
@@ -320,9 +309,9 @@ export default function VendorAnalyticsScreen() {
 
           <View className={`flex-1 min-w-[45%] rounded-xl p-4 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
             <View className="flex-row justify-between items-center mb-2">
-              <ShoppingBag size={20} color="#3b82f6" />
+              <Ionicons name="bag" size={20} color="#3b82f6" />
               <View className="flex-row items-center gap-1">
-                <TrendingUp size={16} color="#22c55e" />
+                <Ionicons name='stats-chart' size={16} color="#22c55e" />
                 <Text className="text-xs font-medium text-green-500">
                   +{analytics.orders.growth.toFixed(1)}%
                 </Text>
@@ -338,9 +327,9 @@ export default function VendorAnalyticsScreen() {
 
           <View className={`flex-1 min-w-[45%] rounded-xl p-4 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
             <View className="flex-row justify-between items-center mb-2">
-              <Users size={20} color="#8b5cf6" />
+              <Ionicons name='person' size={20} color="#8b5cf6" />
               <View className="flex-row items-center gap-1">
-                <TrendingUp size={16} color="#22c55e" />
+                <Ionicons name="stats-chart" size={16} color="#22c55e" />
                 <Text className="text-xs font-medium text-green-500">
                   +{analytics.customers.growth.toFixed(1)}%
                 </Text>
@@ -356,9 +345,9 @@ export default function VendorAnalyticsScreen() {
 
           <View className={`flex-1 min-w-[45%] rounded-xl p-4 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
             <View className="flex-row justify-between items-center mb-2">
-              <Star size={20} color="#f59e0b" />
+              <Ionicons name="star" size={20} color="#f59e0b" />
               <View className="flex-row items-center gap-1">
-                <TrendingUp size={16} color="#22c55e" />
+                <Ionicons name="stats-chart" size={16} color="#22c55e" />
                 <Text className="text-xs font-medium text-green-500">
                   +{analytics.rating.recent_change.toFixed(1)}
                 </Text>
@@ -376,7 +365,7 @@ export default function VendorAnalyticsScreen() {
         {/* Revenue Chart */}
         <View className={`rounded-xl p-6 mb-6 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
           <View className="flex-row items-center mb-5">
-            <TrendingUp size={24} color="#22c55e" />
+            <Ionicons name="stats-chart" size={24} color="#22c55e" />
             <Text className={`text-lg font-bold ml-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Weekly Revenue
             </Text>
@@ -387,7 +376,7 @@ export default function VendorAnalyticsScreen() {
         {/* Peak Hours */}
         <View className={`rounded-xl p-6 mb-6 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
           <View className="flex-row items-center mb-5">
-            <Clock size={24} color="#3b82f6" />
+            <Ionicons name="time" size={24} color="#3b82f6" />
             <Text className={`text-lg font-bold ml-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Peak Hours
             </Text>
@@ -398,7 +387,7 @@ export default function VendorAnalyticsScreen() {
         {/* Popular Items */}
         <View className={`rounded-xl p-6 mb-6 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
           <View className="flex-row items-center mb-5">
-            <Award size={24} color="#f59e0b" />
+            <Ionicons name="medal" size={24} color="#f59e0b" />
             <Text className={`text-lg font-bold ml-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Popular Items
             </Text>
@@ -428,7 +417,7 @@ export default function VendorAnalyticsScreen() {
         {/* Customer Insights */}
         <View className={`rounded-xl p-6 mb-6 ${isDark ? 'bg-gray-800' : 'bg-white'} shadow-sm`}>
           <View className="flex-row items-center mb-5">
-            <Users size={24} color="#8b5cf6" />
+            <Ionicons name="person" size={24} color="#8b5cf6" />
             <Text className={`text-lg font-bold ml-2 ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Customer Insights
             </Text>

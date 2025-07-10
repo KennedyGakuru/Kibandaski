@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, Alert, KeyboardAvoidingView, P
 import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../contexts/AuthContext';
-import { ArrowLeft, Eye, EyeOff, Mail, Lock } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -71,7 +71,7 @@ export default function Login() {
             onPress={() => router.back()}
             className="absolute top-12 left-6 z-10 p-2"
           >
-            <ArrowLeft size={24} color="white" />
+            <Ionicons name="chevron-back" size={24} color="white" />
           </TouchableOpacity>
 
           <View className="items-center mb-10">
@@ -92,7 +92,7 @@ export default function Login() {
               <View className={`flex-row items-center bg-white/15 rounded-2xl px-4 py-1 border-2 ${
                 emailFocused ? 'bg-white/25 border-white/50' : 'border-transparent'
               }`}>
-                <Mail size={20} color={emailFocused ? '#f97316' : 'rgba(255,255,255,0.7)'} />
+                <Ionicons name="mail" size={20} color={emailFocused ? '#f97316' : 'rgba(255,255,255,0.7)'} />
                 <TextInput
                   className="flex-1 text-white text-base py-4 pl-3"
                   placeholder="Enter your email"
@@ -117,7 +117,7 @@ export default function Login() {
               <View className={`flex-row items-center bg-white/15 rounded-2xl px-4 py-1 border-2 ${
                 passwordFocused ? 'bg-white/25 border-white/50' : 'border-transparent'
               }`}>
-                <Lock size={20} color={passwordFocused ? '#f97316' : 'rgba(255,255,255,0.7)'} />
+                <Ionicons name="lock-closed" size={20} color={passwordFocused ? '#f97316' : 'rgba(255,255,255,0.7)'} />
                 <TextInput
                   className="flex-1 text-white text-base py-4 pl-3"
                   placeholder="Enter your password"
@@ -135,9 +135,9 @@ export default function Login() {
                   testID="password-toggle"
                 >
                   {showPassword ? (
-                    <EyeOff size={20} color="rgba(255,255,255,0.7)" />
+                    <Ionicons name="eye-off" size={20} color="rgba(255,255,255,0.7)" />
                   ) : (
-                    <Eye size={20} color="rgba(255,255,255,0.7)" />
+                    <Ionicons name="eye" size={20} color="rgba(255,255,255,0.7)" />
                   )}
                 </TouchableOpacity>
               </View>

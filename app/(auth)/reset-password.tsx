@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { ArrowLeft, Lock, Eye, EyeOff } from 'lucide-react-native';
 import { supabase } from '../../contexts/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function ResetPasswordScreen() {
   const { access_token, refresh_token } = useLocalSearchParams<{
@@ -86,11 +86,11 @@ export default function ResetPasswordScreen() {
           onPress={() => router.back()}
           className="self-start mb-8"
         >
-          <ArrowLeft size={24} color="white" />
+          <Ionicons name="chevron-back" size={24} color="white" />
         </TouchableOpacity>
 
         <View className="bg-white/20 p-6 rounded-full mb-8">
-          <Lock size={64} color="white" />
+          <Ionicons name="lock-closed" size={64} color="white" />
         </View>
 
         <Text className="text-3xl font-bold text-white mb-4 text-center">
@@ -119,9 +119,9 @@ export default function ResetPasswordScreen() {
                 className="p-4"
               >
                 {showPassword ? (
-                  <EyeOff size={20} color="rgba(255,255,255,0.7)" />
+                  <Ionicons name="eye-off" size={20} color="rgba(255,255,255,0.7)" />
                 ) : (
-                  <Eye size={20} color="rgba(255,255,255,0.7)" />
+                  <Ionicons name="eye" size={20} color="rgba(255,255,255,0.7)" />
                 )}
               </TouchableOpacity>
             </View>
@@ -144,9 +144,9 @@ export default function ResetPasswordScreen() {
                 className="p-4"
               >
                 {showConfirmPassword ? (
-                  <EyeOff size={20} color="rgba(255,255,255,0.7)" />
+                  <Ionicons name="eye-off" size={20} color="rgba(255,255,255,0.7)" />
                 ) : (
-                  <Eye size={20} color="rgba(255,255,255,0.7)" />
+                  <Ionicons name="eye" size={20} color="rgba(255,255,255,0.7)" />
                 )}
               </TouchableOpacity>
             </View>

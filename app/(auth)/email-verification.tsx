@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import { router, useLocalSearchParams } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
-import { Mail, ArrowLeft, RefreshCw } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function EmailVerificationScreen() {
   const { email } = useLocalSearchParams<{ email: string }>();
@@ -38,11 +38,11 @@ export default function EmailVerificationScreen() {
           onPress={() => router.back()}
           className="self-start mb-8"
         >
-          <ArrowLeft size={24} color="white" />
+          <Ionicons name="chevron-back" size={24} color="white" />
         </TouchableOpacity>
 
         <View className="bg-white/20 p-6 rounded-full mb-8">
-          <Mail size={64} color="white" />
+        <Ionicons name="mail" size={64} color="white" />
         </View>
 
         <Text className="text-3xl font-bold text-white mb-4 text-center">
@@ -67,7 +67,7 @@ export default function EmailVerificationScreen() {
             onPress={handleResendEmail}
             disabled={!canResend}
           >
-            <RefreshCw size={20} color="white" />
+            <Ionicons name="refresh" size={20} color="white" />
             <Text className="text-white text-base font-medium">
               {canResend ? 'Resend Email' : `Resend in ${countdown}s`}
             </Text>

@@ -3,11 +3,11 @@ import { View, Text, TouchableOpacity, Alert, Platform, FlatList, StyleSheet, Te
 import MapView, { Marker, Region } from 'react-native-maps';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
-import { Search, Filter, List, X } from 'lucide-react-native';
 import * as Location from 'expo-location';
 import { VendorCard } from '../../../components/VendorCard';
 import { SkeletonCard } from '../../../components/SkeletonCard';
 import { supabase } from '../../../contexts/AuthContext';
+import { Ionicons } from '@expo/vector-icons';
 
 interface Vendor {
   id: string;
@@ -178,13 +178,13 @@ export default function CustomerExploreScreen() {
               style={[styles.headerButton, { backgroundColor: isDark ? '#374151' : '#f3f4f6' }]}
               onPress={() => setShowSearch(!showSearch)}
             >
-              <Search size={20} color={isDark ? '#ffffff' : '#374151'} />
+              <Ionicons name="search" size={20} color={isDark ? '#ffffff' : '#374151'} />
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.headerButton, { backgroundColor: '#f97316' }]}
               onPress={() => setShowListView(false)}
             >
-              <Filter size={20} color="white" />
+              <Ionicons name="filter" size={20} color="white" />
             </TouchableOpacity>
           </View>
         </View>
@@ -193,7 +193,7 @@ export default function CustomerExploreScreen() {
         {showSearch && (
           <View style={[styles.searchContainer, { backgroundColor: isDark ? '#1f2937' : '#ffffff' }]}>
             <View style={[styles.searchInputContainer, { backgroundColor: isDark ? '#374151' : '#f3f4f6' }]}>
-              <Search size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+              <Ionicons name="search" size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
               <TextInput
                 style={[styles.searchInput, { color: isDark ? '#ffffff' : '#111827' }]}
                 placeholder="Search vendors, food, or location..."
@@ -204,7 +204,7 @@ export default function CustomerExploreScreen() {
               />
               {searchQuery.length > 0 && (
                 <TouchableOpacity onPress={clearSearch}>
-                  <X size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+                  <Ionicons name="close" size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
                 </TouchableOpacity>
               )}
             </View>
@@ -291,13 +291,13 @@ export default function CustomerExploreScreen() {
             style={[styles.mapHeaderButton, { backgroundColor: isDark ? '#1f2937' : '#ffffff' }]}
             onPress={() => setShowSearch(!showSearch)}
           >
-            <Search size={20} color={isDark ? '#ffffff' : '#374151'} />
+            <Ionicons name='search' size={20} color={isDark ? '#ffffff' : '#374151'} />
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.mapHeaderButton, { backgroundColor: isDark ? '#1f2937' : '#ffffff' }]}
             onPress={() => setShowListView(true)}
           >
-            <List size={20} color={isDark ? '#ffffff' : '#374151'} />
+            <Ionicons name="list" size={20} color={isDark ? '#ffffff' : '#374151'} />
           </TouchableOpacity>
         </View>
       </View>
@@ -307,7 +307,7 @@ export default function CustomerExploreScreen() {
         <View style={[styles.searchOverlay, { backgroundColor: isDark ? '#111827' : '#f9fafb' }]}>
           <View style={[styles.searchHeader, { backgroundColor: isDark ? '#1f2937' : '#ffffff' }]}>
             <View style={[styles.searchInputContainer, { backgroundColor: isDark ? '#374151' : '#f3f4f6' }]}>
-              <Search size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+              <Ionicons name='search' size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
               <TextInput
                 style={[styles.searchInput, { color: isDark ? '#ffffff' : '#111827' }]}
                 placeholder="Search vendors, food, or location..."
@@ -318,7 +318,7 @@ export default function CustomerExploreScreen() {
               />
               {searchQuery.length > 0 && (
                 <TouchableOpacity onPress={clearSearch}>
-                  <X size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+                  <Ionicons name="close" size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
                 </TouchableOpacity>
               )}
             </View>

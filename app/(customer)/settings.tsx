@@ -3,7 +3,7 @@ import { View, Text, TextInput, TouchableOpacity, ScrollView, Alert } from 'reac
 import { useAuth } from '../../contexts/AuthContext';
 import { useTheme } from '../../contexts/ThemeContext';
 import { router } from 'expo-router';
-import { ArrowLeft, Save, User, Mail, Phone, MapPin } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 export default function CustomerSettingsScreen() {
   const { user, updateProfile } = useAuth();
@@ -54,7 +54,7 @@ export default function CustomerSettingsScreen() {
           onPress={() => router.back()}
           className="p-2"
         >
-          <ArrowLeft size={24} color={isDark ? '#ffffff' : '#374151'} />
+          <Ionicons name="chevron-back" size={24} color={isDark ? '#ffffff' : '#374151'} />
         </TouchableOpacity>
         <Text className={`text-xl font-bold flex-1 text-center mx-4 ${isDark ? 'text-white' : 'text-gray-900'}`}>
           Account Settings
@@ -64,7 +64,7 @@ export default function CustomerSettingsScreen() {
           className="p-2 bg-orange-500 rounded-full"
           disabled={loading}
         >
-          <Save size={20} color="white" />
+          <Ionicons name="save" size={20} color="white" />
         </TouchableOpacity>
       </View>
 
@@ -81,7 +81,7 @@ export default function CustomerSettingsScreen() {
               Full Name
             </Text>
             <View className="flex-row items-center rounded-xl px-4 py-1">
-              <User size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+              <Ionicons name='person' size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
               <TextInput
                 className={`flex-1 text-base py-3 pl-3 rounded-lg ${isDark ? 'text-white bg-gray-700' : 'text-gray-900 bg-gray-50'}`}
                 placeholder="Enter your full name"
@@ -98,7 +98,7 @@ export default function CustomerSettingsScreen() {
               Email Address
             </Text>
             <View className="flex-row items-center rounded-xl px-4 py-1">
-              <Mail size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+              <Ionicons name="mail" size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
               <TextInput
                 className={`flex-1 text-base py-3 pl-3 rounded-lg ${isDark ? 'text-white bg-gray-700' : 'text-gray-900 bg-gray-50'}`}
                 placeholder="Enter your email"
@@ -117,7 +117,7 @@ export default function CustomerSettingsScreen() {
               Phone Number
             </Text>
             <View className="flex-row items-center rounded-xl px-4 py-1">
-              <Phone size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+              <Ionicons name="call" size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
               <TextInput
                 className={`flex-1 text-base py-3 pl-3 rounded-lg ${isDark ? 'text-white bg-gray-700' : 'text-gray-900 bg-gray-50'}`}
                 placeholder="Enter your phone number"
@@ -135,7 +135,7 @@ export default function CustomerSettingsScreen() {
               Address
             </Text>
             <View className="flex-row items-center rounded-xl px-4 py-1">
-              <MapPin size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+              <Ionicons name='location' size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
               <TextInput
                 className={`flex-1 text-base py-3 pl-3 rounded-lg ${isDark ? 'text-white bg-gray-700' : 'text-gray-900 bg-gray-50'}`}
                 placeholder="Enter your address"
@@ -173,7 +173,7 @@ export default function CustomerSettingsScreen() {
           onPress={handleSave}
           disabled={loading}
         >
-          <Save size={20} color="white" />
+          <Ionicons name="save" size={20} color="white" />
           <Text className="text-white text-lg font-bold ml-2">
             {loading ? 'Saving...' : 'Save Changes'}
           </Text>

@@ -2,10 +2,10 @@ import { View, Text, TouchableOpacity, ScrollView, Alert, Image, Modal, TextInpu
 import { useAuth } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
 import { router } from 'expo-router';
-import { User, Settings, Moon, Sun, LogOut, Star, MapPin, Heart, Camera, Save, X, CreditCard as Edit3 } from 'lucide-react-native';
 import { useState, useEffect } from 'react';
 import { supabase } from '../../../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
+import { Ionicons } from '@expo/vector-icons';
 
 interface UserStats {
   reviewsCount: number;
@@ -185,7 +185,7 @@ export default function CustomerProfileScreen() {
               <Image source={{ uri: user.avatar_url }} className="w-40 h-40 rounded-full" />
             ) : (
               <View className="w-40 h-40 bg-orange-500 rounded-full items-center justify-center">
-                <User size={40} color="white" />
+                <Ionicons name='person' size={40} color="white" />
               </View>
             )}
           </View>
@@ -213,7 +213,7 @@ export default function CustomerProfileScreen() {
           <View className="flex-row justify-around">
             <View className="items-center">
               <View className={`p-4 rounded-3xl mb-3 ${isDark ? 'bg-orange-600' : 'bg-orange-100'}`}>
-                <Star size={20} color="#f97316" />
+                <Ionicons name='star' size={20} color="#f97316" />
               </View>
               <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 {loading ? '...' : stats.reviewsCount}
@@ -224,7 +224,7 @@ export default function CustomerProfileScreen() {
             </View>
             <View className="items-center">
               <View className={`p-4 rounded-3xl mb-3 ${isDark ? 'bg-green-800' : 'bg-green-100'}`}>
-                <Heart size={20} color="#22c55e" />
+                <Ionicons name='locate' size={20} color="#22c55e" />
               </View>
               <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 {loading ? '...' : stats.favoritesCount}
@@ -235,7 +235,7 @@ export default function CustomerProfileScreen() {
             </View>
             <View className="items-center">
               <View className={`p-4 rounded-3xl mb-3 ${isDark ? 'bg-blue-800' : 'bg-blue-100'}`}>
-                <MapPin size={20} color="#3b82f6" />
+                <Ionicons name='locate' size={20} color="#3b82f6" />
               </View>
               <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
                 {loading ? '...' : stats.visitsCount}
@@ -260,7 +260,7 @@ export default function CustomerProfileScreen() {
             onPress={navigateToFavorites}
           >
             <View className={`p-3 rounded-3xl mr-4 ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
-              <Heart size={20} color="#ef4444" />
+              <Ionicons name="heart" size={20} color="#ef4444" />
             </View>
             <Text className={`flex-1 text-base font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
               My Favorites
@@ -272,7 +272,7 @@ export default function CustomerProfileScreen() {
             onPress={() => setShowEditModal(true)}
           >
             <View className={`p-3 rounded-3xl mr-4 ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
-              <Edit3 size={20} color="#6b7280" />
+              <Ionicons name="card" size={20} color="#6b7280" />
             </View>
             <Text className={`flex-1 text-base font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Edit Profile
@@ -285,9 +285,9 @@ export default function CustomerProfileScreen() {
           >
             <View className={`p-3 rounded-3xl mr-4 ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
               {isDark ? (
-                <Sun size={20} color="#f59e0b" />
+                <Ionicons name='sunny' size={20} color="#f59e0b" />
               ) : (
-                <Moon size={20} color="#6b7280" />
+                <Ionicons name='moon' size={20} color="#6b7280" />
               )}
             </View>
             <Text className={`flex-1 text-base font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -309,7 +309,7 @@ export default function CustomerProfileScreen() {
             onPress={navigateToSettings}
           >
             <View className={`p-3 rounded-3xl mr-4 ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
-              <Settings size={20} color="#6b7280" />
+              <Ionicons name='settings' size={20} color="#6b7280" />
             </View>
             <Text className={`flex-1 text-base font-medium ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Account Settings
@@ -321,7 +321,7 @@ export default function CustomerProfileScreen() {
             onPress={handleSignOut}
           >
             <View className={`p-3 rounded-3xl mr-4 ${isDark ? 'bg-red-900' : 'bg-red-100'}`}>
-              <LogOut size={20} color="#ef4444" />
+              <Ionicons name='log-out' size={20} color="#ef4444" />
             </View>
             <Text className="flex-1 text-base font-medium text-red-500">
               Sign Out
@@ -338,7 +338,7 @@ export default function CustomerProfileScreen() {
               Edit Profile
             </Text>
             <TouchableOpacity onPress={() => setShowEditModal(false)}>
-              <X size={24} color={isDark ? '#ffffff' : '#374151'} />
+              <Ionicons name="close" size={24} color={isDark ? '#ffffff' : '#374151'} />
             </TouchableOpacity>
           </View>
 
@@ -350,11 +350,11 @@ export default function CustomerProfileScreen() {
                   <Image source={{ uri: user.avatar_url }} className="w-40 h-40 rounded-full" />
                 ) : (
                   <View className="w-40 h-40 bg-orange-500 rounded-full items-center justify-center">
-                    <User size={50} color="white" />
+                    <Ionicons name="person" size={50} color="white" />
                   </View>
                 )}
                 <View className="absolute bottom-0 right-0 bg-gray-700 rounded-full p-2.5 border-3 border-white">
-                  <Camera size={20} color="white" />
+                  <Ionicons name="camera" size={20} color="white" />
                 </View>
               </TouchableOpacity>
               <Text className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
@@ -404,7 +404,7 @@ export default function CustomerProfileScreen() {
               onPress={handleSaveProfile}
               disabled={editLoading}
             >
-              <Save size={20} color="white" />
+              <Ionicons name="bookmark" size={20} color="white" />
               <Text className="text-white text-lg font-bold">
                 {editLoading ? 'Saving...' : 'Save Changes'}
               </Text>
