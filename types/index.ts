@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons';
+
 export interface User {
   id: string;
   email: string;
@@ -119,5 +121,23 @@ export interface FeaturedVendor {
     longitude: number;
   };
 }
+
+export type FloatingLabelInputProps = {
+  label: string;
+  value: string;
+  onChangeText: (text: string) => void;
+  onFocus?: () => void;
+  onBlur?: () => void;
+  secureTextEntry?: boolean;
+  keyboardType?: import('react-native').KeyboardTypeOptions;
+  autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
+  autoCorrect?: boolean;
+  autoComplete?: string;
+  icon?: keyof typeof Ionicons.glyphMap;
+  rightIcon?: keyof typeof Ionicons.glyphMap;
+  onRightIconPress?: () => void;
+  focused?: boolean;
+  testID?: string;
+};
 
 

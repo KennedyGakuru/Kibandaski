@@ -26,7 +26,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<User>;
   signUp: (email: string, password: string, name: string, userType: 'customer' | 'vendor') => Promise<void>;
   signOut: () => Promise<void>;
   updateProfile: (updates: Partial<User>) => Promise<void>;
@@ -84,28 +84,41 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signIn = async (email: string, password: string) => {
-    try {
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email: email.trim().toLowerCase(),
-        password,
-      });
+  const signIn = async (email: string, password: string): Promise<User> => {
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email: email.trim().toLowerCase(),
+      password,
+    });
 
-      if (error) {
-        if (error.message.includes('Invalid login credentials')) {
-          throw new Error('Invalid email or password.');
-        } else if (error.message.includes('Email not confirmed')) {
-          throw new Error('Please confirm your email.');
-        } else {
-          throw new Error(error.message);
-        }
+    if (error) {
+      if (error.message.includes('Invalid login credentials')) {
+        throw new Error('Invalid email or password.');
+      } else if (error.message.includes('Email not confirmed')) {
+        throw new Error('Please confirm your email.');
+      } else {
+        throw new Error(error.message);
       }
-
-      if (!data.user) throw new Error('Sign in failed - no user returned.');
-    } catch (error) {
-      throw error;
     }
-  };
+
+    if (!data.user) throw new Error('Sign in failed - no user returned.');
+
+    // 🧠 Fetch user profile from your `users` table
+    const { data: profile, error: profileError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', data.user.id)
+      .single();
+
+    if (profileError) throw profileError;
+
+    setUser(profile);
+    return profile; // ✅ Return full user
+  } catch (error) {
+    throw error;
+  }
+};
+
 
   const signUp = async (email: string, password: string, name: string, userType: 'customer' | 'vendor') => {
     try {
@@ -191,52 +204,61 @@ const uploadAvatar = async (uri: string): Promise<string> => {
   if (!user) throw new Error('No user logged in');
 
   try {
-    console.log('📸 Starting avatar upload for URI:', uri);
-
+    console.log('🔄 Starting avatar upload for URI:', uri);
+    
+    // Get file extension
     const fileExt = uri.split('.').pop()?.toLowerCase() || 'jpg';
     const fileName = `${user.id}-${Date.now()}.${fileExt}`;
     const filePath = `avatars/${fileName}`;
 
-    console.log('📁 File path:', filePath);
-
-    // For React Native, we need to handle the file differently
+    // Create FormData for React Native
     const formData = new FormData();
     formData.append('file', {
-      uri: uri,
-      type: `image/${fileExt}`,
+      uri,
+      type: `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`,
       name: fileName,
     } as any);
 
-    console.log('📦 FormData prepared for upload');
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase.storage
+      .from('avatars')
+      .upload(filePath, formData, {
+        cacheControl: '3600',
+        upsert: true,
+      });
 
-    // Upload using the REST API directly (more reliable than JS client for files)
-    const uploadUrl = `${supabaseUrl}/storage/v1/object/avatars/${fileName}`;
-    
-    const uploadResponse = await fetch(uploadUrl, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${supabaseAnonKey}`,
-        'Content-Type': 'multipart/form-data',
-      },
-      body: formData,
-    });
-
-    if (!uploadResponse.ok) {
-      const errorText = await uploadResponse.text();
-      throw new Error(`Upload failed: ${uploadResponse.status} - ${errorText}`);
+    if (uploadError) {
+      console.error('❌ Upload error:', uploadError);
+      throw uploadError;
     }
 
-    console.log('✅ Upload successful');
+    console.log('✅ Upload successful:', uploadData);
 
     // Get public URL
-    const { data: { publicUrl } } = supabase.storage
+    const { data: { publicUrl } } = supabase
+      .storage
       .from('avatars')
       .getPublicUrl(filePath);
 
     console.log('🔗 Public URL:', publicUrl);
 
-    // Update user profile
-    await updateProfile({ avatar_url: publicUrl });
+    // Update user profile with new avatar URL
+    const { data: updatedUser, error: updateError } = await supabase
+      .from('users')
+      .update({ avatar_url: publicUrl })
+      .eq('id', user.id)
+      .select()
+      .single();
+
+    if (updateError) {
+      console.error('❌ Profile update error:', updateError);
+      throw updateError;
+    }
+
+    console.log('✅ Profile updated:', updatedUser);
+
+    // Update local state
+    setUser(updatedUser);
 
     return publicUrl;
   } catch (error) {
