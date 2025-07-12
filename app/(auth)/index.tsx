@@ -9,17 +9,18 @@ export default function AuthHome() {
   const { user, loading } = useAuth();
 
   useEffect(() => {
-    if (user) {
-      router.replace('/(tabs)');
+    if (!loading && user) {
+      if (user.user_type === 'vendor') {
+        router.replace('/(tabs)/(vendor)');
+      } else {
+        router.replace('/(tabs)/(customer)');
+      }
     }
-  }, [user]);
+  }, [user, loading]);
 
-  if (loading) {
-    return (
-      <View className="flex-1 justify-center items-center bg-white dark:bg-gray-900">
-        <Text className="text-lg font-medium text-gray-800 dark:text-white">Loading...</Text>
-      </View>
-    );
+  // ✅ Don't render anything while checking auth or redirecting
+  if (loading || user) {
+    return null;
   }
 
   return (
@@ -31,7 +32,7 @@ export default function AuthHome() {
         <View className="bg-white/20 p-6 rounded-full mb-8">
           <Ionicons name="location" size={64} color="white" />
         </View>
-        
+
         <Text className="text-4xl font-bold text-white text-center mb-4">
           Kibandaski
         </Text>
