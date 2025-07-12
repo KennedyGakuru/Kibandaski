@@ -1,36 +1,11 @@
-import { View, Text, TouchableOpacity, ScrollView, Alert, Modal, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, ScrollView, Modal, TextInput } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { useState, useEffect } from 'react';
 import { supabase, useAuth } from '../contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
-
-interface Vendor {
-  id: string;
-  user_id: string;
-  name: string;
-  description: string;
-  latitude: number;
-  longitude: number;
-  address: string;
-  phone: string;
-  is_open: boolean;
-  rating: number;
-  total_reviews: number;
-  image_url?: string;
-  created_at: string;
-}
-
-interface Food {
-  id: string;
-  vendor_id: string;
-  name: string;
-  description: string;
-  price: number;
-  category: string;
-  image_url?: string;
-  is_available: boolean;
-  preparation_time: number;
-}
+import { Vendor, Food } from '@/types';
+import Loader from '@/components/Loader';
+import AlertBox from '@/components/AlertBox'; // Add this import
 
 interface VendorCardProps {
   vendor: Vendor;
@@ -47,11 +22,30 @@ export function VendorCard({ vendor, onClose }: VendorCardProps) {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState('');
   const [submittingReview, setSubmittingReview] = useState(false);
+  
+  // Alert state
+  const [alert, setAlert] = useState<{
+    type: 'success' | 'error' | 'warning' | 'info';
+    message: string;
+    visible: boolean;
+  } | null>(null);
 
   useEffect(() => {
     fetchFoods();
     checkFavoriteStatus();
   }, [vendor.id]);
+
+  const showAlert = (type: 'success' | 'error' | 'warning' | 'info', message: string) => {
+    setAlert({ type, message, visible: true });
+    // Auto-hide alert after 3 seconds
+    setTimeout(() => {
+      setAlert(null);
+    }, 3000);
+  };
+
+  const hideAlert = () => {
+    setAlert(null);
+  };
 
   const fetchFoods = async () => {
     try {
@@ -91,7 +85,7 @@ export function VendorCard({ vendor, onClose }: VendorCardProps) {
 
   const toggleFavorite = async () => {
     if (!user) {
-      Alert.alert('Login Required', 'Please login to add favorites');
+      showAlert('warning', 'Please login to add favorites');
       return;
     }
 
@@ -118,18 +112,18 @@ export function VendorCard({ vendor, onClose }: VendorCardProps) {
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);
-      Alert.alert('Error', 'Failed to update favorite');
+      showAlert('error', 'Failed to update favorite');
     }
   };
 
   const submitReview = async () => {
     if (!user) {
-      Alert.alert('Login Required', 'Please login to submit a review');
+      showAlert('warning', 'Please login to submit a review');
       return;
     }
 
     if (!comment.trim()) {
-      Alert.alert('Error', 'Please add a comment to your review');
+      showAlert('error', 'Please add a comment to your review');
       return;
     }
 
@@ -146,16 +140,16 @@ export function VendorCard({ vendor, onClose }: VendorCardProps) {
 
       if (error) throw error;
 
-      Alert.alert('Success', 'Thank you for your review!');
+      showAlert('success', 'Thank you for your review!');
       setShowRatingModal(false);
       setComment('');
       setRating(5);
     } catch (error: any) {
       console.error('Error submitting review:', error);
       if (error.code === '23505') {
-        Alert.alert('Error', 'You have already reviewed this vendor');
+        showAlert('error', 'You have already reviewed this vendor');
       } else {
-        Alert.alert('Error', 'Failed to submit review. Please try again.');
+        showAlert('error', 'Failed to submit review. Please try again.');
       }
     } finally {
       setSubmittingReview(false);
@@ -173,6 +167,17 @@ export function VendorCard({ vendor, onClose }: VendorCardProps) {
   return (
     <>
       <View className={`absolute bottom-0 left-0 right-0 max-h-[70%] rounded-t-3xl shadow-2xl ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+        {/* Alert Box */}
+        {alert?.visible && (
+          <View className="absolute top-4 left-4 right-4 z-50">
+            <AlertBox
+              type={alert.type}
+              message={alert.message}
+              onClose={hideAlert}
+            />
+          </View>
+        )}
+
         <View className={`p-6 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
           <View className="flex-row items-center justify-between mb-4">
             <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
@@ -245,9 +250,9 @@ export function VendorCard({ vendor, onClose }: VendorCardProps) {
           </Text>
           
           {loading ? (
-            <Text className={`text-base text-center py-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-              Loading menu...
-            </Text>
+            <View className="items-center py-8">
+              <Loader size={32} />
+            </View>
           ) : foods.length === 0 ? (
             <Text className={`text-base text-center py-5 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
               No menu items available
@@ -318,6 +323,17 @@ export function VendorCard({ vendor, onClose }: VendorCardProps) {
       {/* Rating Modal */}
       <Modal visible={showRatingModal} animationType="slide" presentationStyle="pageSheet">
         <View className={`flex-1 pt-12 px-6 ${isDark ? 'bg-gray-900' : 'bg-white'}`}>
+          {/* Alert Box for Modal */}
+          {alert?.visible && (
+            <View className="mb-4">
+              <AlertBox
+                type={alert.type}
+                message={alert.message}
+                onClose={hideAlert}
+              />
+            </View>
+          )}
+
           <View className="flex-row items-center justify-between mb-8">
             <Text className={`text-2xl font-bold ${isDark ? 'text-white' : 'text-gray-900'}`}>
               Rate {vendor.name}
