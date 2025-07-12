@@ -8,22 +8,7 @@ import { VendorCard } from '../../../components/VendorCard';
 import { SkeletonCard } from '../../../components/SkeletonCard';
 import { supabase } from '../../../contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
-
-interface Vendor {
-  id: string;
-  user_id: string;
-  name: string;
-  description: string;
-  latitude: number;
-  longitude: number;
-  address: string;
-  phone: string;
-  is_open: boolean;
-  rating: number;
-  total_reviews: number;
-  image_url?: string;
-  created_at: string;
-}
+import { Vendor } from '@/types';
 
 export default function CustomerExploreScreen() {
   const { user } = useAuth();
@@ -118,6 +103,33 @@ export default function CustomerExploreScreen() {
     setShowSearch(false);
   };
 
+  // Consistent Search Bar Component
+  const SearchBarComponent = ({ style, onCancel }: { style?: any, onCancel?: () => void }) => (
+    <View style={[styles.searchBarContainer, style]}>
+      <View style={[styles.searchInputContainer, { backgroundColor: isDark ? '#374151' : '#f3f4f6' }]}>
+        <Ionicons name="search" size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+        <TextInput
+          style={[styles.searchInput, { color: isDark ? '#ffffff' : '#111827' }]}
+          placeholder="Search vendors, food, or location..."
+          placeholderTextColor={isDark ? '#9ca3af' : '#6b7280'}
+          value={searchQuery}
+          onChangeText={setSearchQuery}
+          autoFocus
+        />
+        {searchQuery.length > 0 && (
+          <TouchableOpacity onPress={clearSearch}>
+            <Ionicons name="close" size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
+          </TouchableOpacity>
+        )}
+      </View>
+      {onCancel && (
+        <TouchableOpacity onPress={onCancel}>
+          <Text style={[styles.cancelText, { color: '#f97316' }]}>Cancel</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
+
   const renderVendorItem = ({ item }: { item: Vendor }) => (
     <TouchableOpacity
       style={[styles.vendorListItem, { backgroundColor: isDark ? '#1f2937' : '#ffffff' }]}
@@ -184,7 +196,7 @@ export default function CustomerExploreScreen() {
               style={[styles.headerButton, { backgroundColor: '#f97316' }]}
               onPress={() => setShowListView(false)}
             >
-              <Ionicons name="filter" size={20} color="white" />
+              <Ionicons name="map" size={20} color="white" />
             </TouchableOpacity>
           </View>
         </View>
@@ -192,22 +204,7 @@ export default function CustomerExploreScreen() {
         {/* Search Bar */}
         {showSearch && (
           <View style={[styles.searchContainer, { backgroundColor: isDark ? '#1f2937' : '#ffffff' }]}>
-            <View style={[styles.searchInputContainer, { backgroundColor: isDark ? '#374151' : '#f3f4f6' }]}>
-              <Ionicons name="search" size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
-              <TextInput
-                style={[styles.searchInput, { color: isDark ? '#ffffff' : '#111827' }]}
-                placeholder="Search vendors, food, or location..."
-                placeholderTextColor={isDark ? '#9ca3af' : '#6b7280'}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoFocus
-              />
-              {searchQuery.length > 0 && (
-                <TouchableOpacity onPress={clearSearch}>
-                  <Ionicons name="close" size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
-                </TouchableOpacity>
-              )}
-            </View>
+            <SearchBarComponent />
           </View>
         )}
 
@@ -265,17 +262,11 @@ export default function CustomerExploreScreen() {
               latitude: vendor.latitude,
               longitude: vendor.longitude,
             }}
+            title={vendor.name}
+            description={vendor.address}
             onPress={() => handleMarkerPress(vendor)}
-          >
-            <View style={[
-              styles.markerContainer,
-              { backgroundColor: vendor.is_open ? '#f97316' : '#6b7280' }
-            ]}>
-              <View style={styles.markerInner}>
-                <Text style={styles.markerEmoji}>🍽️</Text>
-              </View>
-            </View>
-          </Marker>
+            pinColor={vendor.is_open ? '#f97316' : '#9ca3af'}
+          />
         ))}
       </MapView>
 
@@ -306,25 +297,7 @@ export default function CustomerExploreScreen() {
       {showSearch && (
         <View style={[styles.searchOverlay, { backgroundColor: isDark ? '#111827' : '#f9fafb' }]}>
           <View style={[styles.searchHeader, { backgroundColor: isDark ? '#1f2937' : '#ffffff' }]}>
-            <View style={[styles.searchInputContainer, { backgroundColor: isDark ? '#374151' : '#f3f4f6' }]}>
-              <Ionicons name='search' size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
-              <TextInput
-                style={[styles.searchInput, { color: isDark ? '#ffffff' : '#111827' }]}
-                placeholder="Search vendors, food, or location..."
-                placeholderTextColor={isDark ? '#9ca3af' : '#6b7280'}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-                autoFocus
-              />
-              {searchQuery.length > 0 && (
-                <TouchableOpacity onPress={clearSearch}>
-                  <Ionicons name="close" size={20} color={isDark ? '#9ca3af' : '#6b7280'} />
-                </TouchableOpacity>
-              )}
-            </View>
-            <TouchableOpacity onPress={() => setShowSearch(false)}>
-              <Text style={[styles.cancelText, { color: '#f97316' }]}>Cancel</Text>
-            </TouchableOpacity>
+            <SearchBarComponent onCancel={() => setShowSearch(false)} />
           </View>
 
           {/* Search Results */}
@@ -374,24 +347,6 @@ const styles = StyleSheet.create({
   map: {
     flex: 1,
   },
-  markerContainer: {
-    padding: 8,
-    borderRadius: 20,
-    borderWidth: 3,
-    borderColor: 'white',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 4,
-    elevation: 5,
-  },
-  markerInner: {
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  markerEmoji: {
-    fontSize: 18,
-  },
   mapHeader: {
     position: 'absolute',
     top: 48,
@@ -428,6 +383,8 @@ const styles = StyleSheet.create({
     shadowRadius: 4,
     elevation: 3,
   },
+  
+  // Search Components - Consistent Styling
   searchOverlay: {
     position: 'absolute',
     top: 0,
@@ -440,13 +397,15 @@ const styles = StyleSheet.create({
     paddingTop: 48,
     paddingBottom: 16,
     paddingHorizontal: 24,
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
   },
   searchContainer: {
     paddingHorizontal: 24,
     paddingVertical: 16,
+  },
+  searchBarContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 12,
   },
   searchInputContainer: {
     flex: 1,
@@ -456,19 +415,25 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 12,
     gap: 12,
+    minHeight: 48, // Consistent height
   },
   searchInput: {
     flex: 1,
     fontSize: 16,
+    minHeight: 20,
   },
   cancelText: {
     fontSize: 16,
     fontWeight: '500',
+    minWidth: 60,
+    textAlign: 'center',
   },
   searchResults: {
     paddingTop: 16,
     paddingBottom: 100,
   },
+  
+  // List View Styles
   listHeader: {
     paddingTop: 48,
     paddingBottom: 16,

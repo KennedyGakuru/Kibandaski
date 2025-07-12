@@ -6,6 +6,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '../../../contexts/AuthContext';
 import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
+import AlertBox from '@/components/AlertBox';
 
 interface UserStats {
   reviewsCount: number;
@@ -15,6 +16,7 @@ interface UserStats {
 
 export default function CustomerProfileScreen() {
   const { user, signOut, uploadAvatar, updateProfile } = useAuth();
+  const [alert, setAlert] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const { isDark, toggleTheme } = useTheme();
   const [stats, setStats] = useState<UserStats>({
     reviewsCount: 0,
@@ -38,6 +40,14 @@ export default function CustomerProfileScreen() {
       });
     }
   }, [user]);
+
+  useEffect(() => {
+  if (alert) {
+    const timer = setTimeout(() => setAlert(null), 4000);
+    return () => clearTimeout(timer);
+  }
+}, [alert]);
+
 
   const fetchUserStats = async () => {
     if (!user) return;
@@ -100,73 +110,85 @@ export default function CustomerProfileScreen() {
   };
 
   const pickImage = async (source: 'camera' | 'gallery') => {
-    try {
-      let result;
-      
-      if (source === 'camera') {
-        const { status } = await ImagePicker.requestCameraPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert('Permission needed', 'Camera permission is required to take photos');
-          return;
-        }
-        result = await ImagePicker.launchCameraAsync({
-          mediaTypes: ['images'],
-          allowsEditing: true,
-          aspect: [1, 1],
-          quality: 0.8,
-        });
-      } else {
-        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert('Permission needed', 'Gallery permission is required to select photos');
-          return;
-        }
-        result = await ImagePicker.launchImageLibraryAsync({
-          mediaTypes: ['images'],
-          allowsEditing: true,
-          aspect: [1, 1],
-          quality: 0.8,
-        });
+  try {
+    let result;
+    
+    if (source === 'camera') {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== 'granted') {
+        setAlert({ type: 'error', message: 'Camera permission is required to take photos' });
+        return;
       }
-
-      if (!result.canceled && result.assets[0]) {
-        const imageUri = result.assets[0].uri;
-        await uploadAvatar(imageUri);
-        Alert.alert('Success', 'Profile picture updated successfully!');
+      result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Fixed: Use proper enum
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+    } else {
+      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== 'granted') {
+        setAlert({ type: 'error', message: 'Gallery permission is required to select photos' });
+        return;
       }
-    } catch (error) {
-      console.error('Error picking image:', error);
-      Alert.alert('Error', 'Failed to update profile picture');
+      result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images, // Fixed: Use proper enum
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
     }
-  };
+
+    if (!result.canceled && result.assets[0]) {
+      const imageUri = result.assets[0].uri;
+      console.log('📸 Selected image URI:', imageUri);
+      
+      // Add loading state
+      setAlert({ type: 'success', message: 'Uploading profile picture...' });
+      
+      try {
+        await uploadAvatar(imageUri);
+        setAlert({ type: 'success', message: 'Profile picture updated successfully!' });
+      } catch (error) {
+        console.error('Upload failed:', error);
+        setAlert({ type: 'error', message: 'Failed to update profile picture. Please try again.' });
+      }
+    }
+  } catch (error) {
+    console.error('Error picking image:', error);
+    setAlert({ type: 'error', message: 'Failed to select image. Please try again.' });
+  }
+};
+
 
   const handleSaveProfile = async () => {
-    if (!formData.name.trim()) {
-      Alert.alert('Error', 'Name is required');
-      return;
-    }
+  if (!formData.name.trim()) {
+    setAlert({ type: 'error', message: 'Name is required' });
+    return;
+  }
 
-    if (!formData.email.trim()) {
-      Alert.alert('Error', 'Email is required');
-      return;
-    }
+  if (!formData.email.trim()) {
+    setAlert({ type: 'error', message: 'Email is required' });
+    return;
+  }
 
-    setEditLoading(true);
-    try {
-      await updateProfile({
-        name: formData.name.trim(),
-        email: formData.email.trim().toLowerCase(),
-      });
-      
-      setShowEditModal(false);
-      Alert.alert('Success', 'Profile updated successfully!');
-    } catch (error: any) {
-      console.error('Error updating profile:', error);
-      Alert.alert('Error', error.message || 'Failed to update profile');
-    } finally {
-      setEditLoading(false);
-    }
-  };
+  setEditLoading(true);
+  try {
+    await updateProfile({
+      name: formData.name.trim(),
+      email: formData.email.trim().toLowerCase(),
+    });
+    
+    setShowEditModal(false);
+    setAlert({ type: 'success', message: 'Profile updated successfully!' });
+  } catch (error: any) {
+    console.error('Error updating profile:', error);
+    setAlert({ type: 'error', message: 'Failed to update profile' });
+  } finally {
+    setEditLoading(false);
+  }
+};
+
 
   const navigateToFavorites = () => {
     router.push('/(tabs)/(customer)/favorites');
@@ -179,6 +201,14 @@ export default function CustomerProfileScreen() {
   return (
     <ScrollView className={`flex-1 ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       <View className={`pt-12 pb-6 px-6 shadow-lg ${isDark ? 'bg-gray-800' : 'bg-white'}`}>
+        {alert && (
+          <AlertBox
+           type={alert.type}
+           message={alert.message}
+           onClose={() => setAlert(null)}
+           />
+           )}
+
         <View className="items-center">
           <View className="relative mb-4">
             {user?.avatar_url ? (
