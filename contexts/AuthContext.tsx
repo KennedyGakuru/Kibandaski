@@ -199,71 +199,52 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(data);
   };
 
-  // Solution 1: Use React Native's built-in file handling
-const uploadAvatar = async (uri: string): Promise<string> => {
+  
+ const uploadAvatar = async (uri: string): Promise<string> => {
   if (!user) throw new Error('No user logged in');
 
   try {
-    console.log('🔄 Starting avatar upload for URI:', uri);
+    //console.log('🔄 Starting avatar upload for URI:', uri);
     
-    // Get file extension
     const fileExt = uri.split('.').pop()?.toLowerCase() || 'jpg';
-    const fileName = `${user.id}-${Date.now()}.${fileExt}`;
-    const filePath = `avatars/${fileName}`;
+    const fileName = `avatar-${Date.now()}.${fileExt}`;
+    const filePath = `${user.id}/${fileName}`;
 
-    // Create FormData for React Native
-    const formData = new FormData();
-    formData.append('file', {
+    const file = {
       uri,
-      type: `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`,
       name: fileName,
-    } as any);
+      type: `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`,
+    };
 
-    // Upload to Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabase.storage
+    const formData = new FormData();
+    formData.append('file', file as any);
+
+    const { data, error } = await supabase.storage
       .from('avatars')
       .upload(filePath, formData, {
-        cacheControl: '3600',
+        contentType: file.type,
         upsert: true,
       });
 
-    if (uploadError) {
-      console.error('❌ Upload error:', uploadError);
-      throw uploadError;
+    if (error) {
+      console.error('❌ Upload error:', error);
+      throw error;
     }
 
-    console.log('✅ Upload successful:', uploadData);
-
-    // Get public URL
     const { data: { publicUrl } } = supabase
       .storage
       .from('avatars')
       .getPublicUrl(filePath);
 
-    console.log('🔗 Public URL:', publicUrl);
-
-    // Update user profile with new avatar URL
-    const { data: updatedUser, error: updateError } = await supabase
-      .from('users')
+    // Optionally update user profile
+    await supabase.from('users')
       .update({ avatar_url: publicUrl })
-      .eq('id', user.id)
-      .select()
-      .single();
-
-    if (updateError) {
-      console.error('❌ Profile update error:', updateError);
-      throw updateError;
-    }
-
-    console.log('✅ Profile updated:', updatedUser);
-
-    // Update local state
-    setUser(updatedUser);
+      .eq('id', user.id);
 
     return publicUrl;
-  } catch (error) {
-    console.error('❌ Avatar upload error:', error);
-    throw error;
+  } catch (err) {
+    console.error('❌ Avatar upload error:', err);
+    throw err;
   }
 };
 
