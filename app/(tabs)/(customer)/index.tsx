@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Alert, Platform, FlatList, StyleSheet, TextInput } from 'react-native';
+import { View, Text, TouchableOpacity, Alert, Platform, FlatList, StyleSheet, TextInput, Image } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { useAuth } from '../../../contexts/AuthContext';
 import { useTheme } from '../../../contexts/ThemeContext';
@@ -102,6 +102,16 @@ export default function CustomerExploreScreen() {
     setSearchQuery('');
     setShowSearch(false);
   };
+
+  const ResizedImageMarker = ({ vendor }: { vendor: Vendor }) => (
+    <View style={styles.imageMarkerContainer}>
+      <Image
+        source={require('../../../assets/vendoricon.png')}
+        style={styles.resizedMarkerImage}
+        resizeMode="contain"
+      />
+    </View>
+  );
 
   // Consistent Search Bar Component
   const SearchBarComponent = ({ style, onCancel }: { style?: any, onCancel?: () => void }) => (
@@ -249,7 +259,7 @@ export default function CustomerExploreScreen() {
 
   return (
     <View style={styles.container}>
-      <MapView
+       <MapView
         style={styles.map}
         region={region}
         onRegionChangeComplete={setRegion}
@@ -257,16 +267,17 @@ export default function CustomerExploreScreen() {
       >
         {filteredVendors.map((vendor) => (
           <Marker
-            key={vendor.id}
-            coordinate={{
-              latitude: vendor.latitude,
-              longitude: vendor.longitude,
-            }}
-            title={vendor.name}
-            description={vendor.address}
-            onPress={() => handleMarkerPress(vendor)}
-            pinColor={vendor.is_open ? '#f97316' : '#9ca3af'}
-          />
+  key={vendor.id}
+  coordinate={{
+    latitude: vendor.latitude,
+    longitude: vendor.longitude,
+  }}
+  onPress={() => handleMarkerPress(vendor)}
+  anchor={{ x: 0.5, y: 1 }}
+  image={require('../../../assets/vendoricon.png')}
+/>
+
+
         ))}
       </MapView>
 
@@ -524,4 +535,49 @@ const styles = StyleSheet.create({
     fontSize: 16,
     textAlign: 'center',
   },
+  customMarker: {
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+
+emojiCircle: {
+  width: 50,
+  height: 50,
+  borderRadius: 25,
+  alignItems: 'center',
+  justifyContent: 'center',
+  borderWidth: 2,
+  borderColor: 'white',
+  shadowColor: '#000',
+  shadowOffset: { width: 0, height: 2 },
+  shadowOpacity: 0.3,
+  shadowRadius: 4,
+  elevation: 5,
+},
+
+emoji: {
+  fontSize: 24,
+},
+
+markerTail: {
+  width: 0,
+  height: 0,
+  borderLeftWidth: 8,
+  borderRightWidth: 8,
+  borderTopWidth: 12,
+  borderLeftColor: 'transparent',
+  borderRightColor: 'transparent',
+  borderTopColor: '#f97316', // Same as circle bg
+  marginTop: -1,
+},
+imageMarkerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  resizedMarkerImage: {
+    width: 30,
+    height: 30,
+  },
+
+
 });
