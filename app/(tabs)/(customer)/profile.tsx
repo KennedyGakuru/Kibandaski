@@ -107,7 +107,7 @@ export default function CustomerProfileScreen() {
         { text: 'Choose from Gallery', onPress: () => pickImage('gallery') },
       ]
     );
-  };
+  }; 
 
   const pickImage = async (source: 'camera' | 'gallery') => {
   try {
@@ -141,7 +141,7 @@ export default function CustomerProfileScreen() {
 
     if (!result.canceled && result.assets[0]) {
       const imageUri = result.assets[0].uri;
-      console.log('📸 Selected image URI:', imageUri);
+      //console.log('📸 Selected image URI:', imageUri);
       
       // Add loading state
       setAlert({ type: 'success', message: 'Uploading profile picture...' });
