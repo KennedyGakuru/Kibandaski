@@ -9,7 +9,6 @@ import { Platform } from 'react-native';
 const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || '';
 
-
 if (!supabaseUrl || !supabaseAnonKey) {
   throw new Error('Missing Supabase environment variables. Check your .env and EAS config.');
 }
@@ -39,14 +38,51 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session?.user) fetchUserProfile(session.user.id);
-      else setLoading(false);
-    });
+    let mounted = true;
 
+    const initAuth = async () => {
+      try {
+        // Get initial session
+        const { data: { session }, error } = await supabase.auth.getSession();
+        
+        if (error) {
+          console.error('Error getting session:', error);
+          if (mounted) {
+            setLoading(false);
+            setInitialized(true);
+          }
+          return;
+        }
+
+        if (session?.user && mounted) {
+          await fetchUserProfile(session.user.id);
+        } else if (mounted) {
+          setLoading(false);
+        }
+        
+        if (mounted) {
+          setInitialized(true);
+        }
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+        if (mounted) {
+          setLoading(false);
+          setInitialized(true);
+        }
+      }
+    };
+
+    initAuth();
+
+    // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (!mounted || !initialized) return;
+
+      console.log('Auth state changed:', event);
+      
       if (event === 'SIGNED_IN' && session?.user) {
         await fetchUserProfile(session.user.id);
       } else if (event === 'SIGNED_OUT') {
@@ -58,12 +94,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     return () => {
+      mounted = false;
       subscription.unsubscribe();
     };
   }, []);
 
   const fetchUserProfile = async (userId: string) => {
     try {
+      setLoading(true);
+      
       const { data, error } = await supabase
         .from('users')
         .select('*')
@@ -71,13 +110,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         .single();
 
       if (error) {
-        if (error.code === 'PGRST116') throw new Error('User profile not found.');
+        if (error.code === 'PGRST116') {
+          throw new Error('User profile not found.');
+        }
         throw error;
       }
 
       setUser(data);
     } catch (error) {
-      await supabase.auth.signOut();
+      console.error('Error fetching user profile:', error);
+      // Only sign out if it's a profile error, not a network error
+      if (typeof error === 'object' && error !== null && 'message' in error && typeof (error as any).message === 'string' && (error as any).message.includes('User profile not found')) {
+        await supabase.auth.signOut();
+      }
       throw error;
     } finally {
       setLoading(false);
@@ -85,43 +130,48 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   const signIn = async (email: string, password: string): Promise<User> => {
-  try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email: email.trim().toLowerCase(),
-      password,
-    });
+    try {
+      setLoading(true);
+      
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email: email.trim().toLowerCase(),
+        password,
+      });
 
-    if (error) {
-      if (error.message.includes('Invalid login credentials')) {
-        throw new Error('Invalid email or password.');
-      } else if (error.message.includes('Email not confirmed')) {
-        throw new Error('Please confirm your email.');
-      } else {
-        throw new Error(error.message);
+      if (error) {
+        if (error.message.includes('Invalid login credentials')) {
+          throw new Error('Invalid email or password.');
+        } else if (error.message.includes('Email not confirmed')) {
+          throw new Error('Please confirm your email.');
+        } else {
+          throw new Error(error.message);
+        }
       }
+
+      if (!data.user) throw new Error('Sign in failed - no user returned.');
+
+      // Fetch user profile from your `users` table
+      const { data: profile, error: profileError } = await supabase
+        .from('users')
+        .select('*')
+        .eq('id', data.user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      setUser(profile);
+      return profile;
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
     }
-
-    if (!data.user) throw new Error('Sign in failed - no user returned.');
-
-    // 🧠 Fetch user profile from your `users` table
-    const { data: profile, error: profileError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('id', data.user.id)
-      .single();
-
-    if (profileError) throw profileError;
-
-    setUser(profile);
-    return profile; // ✅ Return full user
-  } catch (error) {
-    throw error;
-  }
-};
-
+  };
 
   const signUp = async (email: string, password: string, name: string, userType: 'customer' | 'vendor') => {
     try {
+      setLoading(true);
+      
       if (password.length < 6) throw new Error('Password must be at least 6 characters.');
       if (!name.trim()) throw new Error('Name is required.');
 
@@ -161,7 +211,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         }
 
         setUser(fallbackData);
-        setLoading(false);
         return;
       }
 
@@ -173,16 +222,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
       if (fetchError) throw new Error('Profile created but fetch failed.');
       setUser(completeProfile);
-      setLoading(false);
     } catch (error) {
-      setLoading(false);
       throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
+    try {
+      setLoading(true);
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setUser(null);
+    } catch (error) {
+      throw error;
+    } finally {
+      setLoading(false);
+    }
   };
 
   const updateProfile = async (updates: Partial<User>) => {
@@ -199,141 +256,137 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setUser(data);
   };
 
-  
- const uploadAvatar = async (uri: string): Promise<string> => {
-  if (!user) throw new Error('No user logged in');
+  const uploadAvatar = async (uri: string): Promise<string> => {
+    if (!user) throw new Error('No user logged in');
 
-  try {
-    //console.log('🔄 Starting avatar upload for URI:', uri);
-    
-    const fileExt = uri.split('.').pop()?.toLowerCase() || 'jpg';
-    const fileName = `avatar-${Date.now()}.${fileExt}`;
-    const filePath = `${user.id}/${fileName}`;
+    try {
+      const fileExt = uri.split('.').pop()?.toLowerCase() || 'jpg';
+      const fileName = `avatar-${Date.now()}.${fileExt}`;
+      const filePath = `${user.id}/${fileName}`;
 
-    const file = {
-      uri,
-      name: fileName,
-      type: `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`,
-    };
+      const file = {
+        uri,
+        name: fileName,
+        type: `image/${fileExt === 'jpg' ? 'jpeg' : fileExt}`,
+      };
 
-    const formData = new FormData();
-    formData.append('file', file as any);
+      const formData = new FormData();
+      formData.append('file', file as any);
 
-    const { data, error } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, formData, {
-        contentType: file.type,
-        upsert: true,
-      });
+      const { data, error } = await supabase.storage
+        .from('avatars')
+        .upload(filePath, formData, {
+          contentType: file.type,
+          upsert: true,
+        });
 
-    if (error) {
-      console.error('❌ Upload error:', error);
-      throw error;
+      if (error) {
+        console.error('❌ Upload error:', error);
+        throw error;
+      }
+
+      const { data: { publicUrl } } = supabase
+        .storage
+        .from('avatars')
+        .getPublicUrl(filePath);
+
+      // Update user profile
+      await supabase.from('users')
+        .update({ avatar_url: publicUrl })
+        .eq('id', user.id);
+
+      return publicUrl;
+    } catch (err) {
+      console.error('❌ Avatar upload error:', err);
+      throw err;
     }
-
-    const { data: { publicUrl } } = supabase
-      .storage
-      .from('avatars')
-      .getPublicUrl(filePath);
-
-    // Optionally update user profile
-    await supabase.from('users')
-      .update({ avatar_url: publicUrl })
-      .eq('id', user.id);
-
-    return publicUrl;
-  } catch (err) {
-    console.error('❌ Avatar upload error:', err);
-    throw err;
-  }
-};
+  };
 
   const signInWithGoogle = async () => {
-  try {
-    setLoading(true);
+    try {
+      setLoading(true);
 
-    const redirectUrl = makeRedirectUri(); // ✅ Expo Go proxy URL
+      const redirectUrl = makeRedirectUri();
+      console.log('🔗 Redirect URL:', redirectUrl);
 
-    console.log('🔗 Redirect URL:', redirectUrl);
-
-    const { data, error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: redirectUrl,
-        queryParams: {
-          access_type: 'offline',
-          prompt: 'consent',
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider: 'google',
+        options: {
+          redirectTo: redirectUrl,
+          queryParams: {
+            access_type: 'offline',
+            prompt: 'consent',
+          },
         },
-      },
-    });
+      });
 
-    if (error) throw error;
+      if (error) throw error;
 
-    if (Platform.OS !== 'web') {
-      const result = await WebBrowser.openAuthSessionAsync(
-        data.url,
-        redirectUrl
-      );
+      if (Platform.OS !== 'web') {
+        const result = await WebBrowser.openAuthSessionAsync(
+          data.url,
+          redirectUrl
+        );
 
-      if (result.type === 'success' && result.url) {
-        const url = new URL(result.url);
-        const access_token = url.searchParams.get('access_token');
-        const refresh_token = url.searchParams.get('refresh_token');
+        if (result.type === 'success' && result.url) {
+          const url = new URL(result.url);
+          const access_token = url.searchParams.get('access_token');
+          const refresh_token = url.searchParams.get('refresh_token');
 
-        if (access_token && refresh_token) {
-          const { data: sessionData, error: sessionError } =
-            await supabase.auth.setSession({
-              access_token,
-              refresh_token,
-            });
+          if (access_token && refresh_token) {
+            const { data: sessionData, error: sessionError } =
+              await supabase.auth.setSession({
+                access_token,
+                refresh_token,
+              });
 
-          if (sessionError) throw sessionError;
+            if (sessionError) throw sessionError;
 
-          if (sessionData.user) {
-            const { data: existingUser, error: fetchError } = await supabase
-              .from('users')
-              .select('*')
-              .eq('id', sessionData.user.id)
-              .single();
-
-            if (fetchError && fetchError.code === 'PGRST116') {
-              const { data: newUser, error: createError } = await supabase
+            if (sessionData.user) {
+              const { data: existingUser, error: fetchError } = await supabase
                 .from('users')
-                .insert({
-                  id: sessionData.user.id,
-                  email: sessionData.user.email || '',
-                  name:
-                    sessionData.user.user_metadata?.full_name ||
-                    sessionData.user.email?.split('@')[0] ||
-                    'User',
-                  avatar_url: sessionData.user.user_metadata?.avatar_url,
-                  user_type: 'customer',
-                })
-                .select()
+                .select('*')
+                .eq('id', sessionData.user.id)
                 .single();
 
-              if (createError) throw createError;
-              setUser(newUser);
-              return newUser;
-            } else if (existingUser) {
-              setUser(existingUser);
-              return existingUser;
+              if (fetchError && fetchError.code === 'PGRST116') {
+                const { data: newUser, error: createError } = await supabase
+                  .from('users')
+                  .insert({
+                    id: sessionData.user.id,
+                    email: sessionData.user.email || '',
+                    name:
+                      sessionData.user.user_metadata?.full_name ||
+                      sessionData.user.email?.split('@')[0] ||
+                      'User',
+                    avatar_url: sessionData.user.user_metadata?.avatar_url,
+                    user_type: 'customer',
+                  })
+                  .select()
+                  .single();
+
+                if (createError) throw createError;
+                setUser(newUser);
+                return newUser;
+              } else if (existingUser) {
+                setUser(existingUser);
+                return existingUser;
+              }
             }
           }
         }
+      } else {
+        console.log('🌐 Opening OAuth URL for web:', data.url);
       }
-    } else {
-      console.log('🌐 Opening OAuth URL for web:', data.url);
-    }
 
-    throw new Error('Google sign-in failed');
-  } catch (error) {
-    console.error('❌ Google sign-in error:', error);
-    throw error;
-  } finally {
-    setLoading(false);
-  }
-};
+      throw new Error('Google sign-in failed');
+    } catch (error) {
+      console.error('❌ Google sign-in error:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <AuthContext.Provider

@@ -8,13 +8,15 @@ export default () => ({
   splash: {
     image: "./assets/splash.png",
     resizeMode: "contain",
-    backgroundColor: "#ffffff"
+    backgroundColor: "#000000"  // Changed to black to match your theme
   },
   userInterfaceStyle: "automatic",
   assetBundlePatterns: ["**/*"],
   newArchEnabled: true,
   ios: {
-    supportsTablet: true
+    supportsTablet: true,
+    statusBarStyle: "auto",
+    userInterfaceStyle: "automatic"
   },
   android: {
     icon: "./assets/icon.png",
@@ -22,9 +24,26 @@ export default () => ({
     package: "com.kengakuru.kibandaski",
     config: {
       googleMaps: {
-        apiKey: process.env.GOOGLE_MAPS_API_KEY
+        apiKey: process.env.EXPO_PUBLIC_GOOGLE_MAPS_API_KEY
+
       }
-    }
+    },
+    // Navigation bar configuration to fix white stripe
+    navigationBar: {
+      backgroundColor: "#000000",
+      barStyle: "dark-content"
+    },
+    // Status bar configuration
+    statusBar: {
+      backgroundColor: "#000000",
+      barStyle: "dark-content",
+      translucent: false,
+      hidden: false
+    },
+    // Additional Android-specific configurations
+    softwareKeyboardLayoutMode: "pan",
+    allowBackup: true,
+    theme: "@style/AppTheme"
   },
   web: {
     favicon: "./assets/favicon.png",
@@ -34,7 +53,17 @@ export default () => ({
   plugins: [
     "expo-router",
     "expo-font",
-    "expo-web-browser"
+    "expo-web-browser", 
+    [
+      "expo-splash-screen",
+      {
+        backgroundColor: "#000000",
+        image: "./assets/splash.png",
+        imageWidth: 200,
+        resizeMode: "contain",
+        placement: "center"
+      }
+    ]
   ],
   experiments: {
     tsconfigPaths: true,

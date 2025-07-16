@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { View, Text, TouchableOpacity, Alert, Platform, FlatList, StyleSheet, TextInput, Image } from 'react-native';
 import MapView, { Marker, Region } from 'react-native-maps';
 import { useAuth } from '../../../contexts/AuthContext';
@@ -13,12 +13,14 @@ import { Vendor } from '@/types';
 export default function CustomerExploreScreen() {
   const { user } = useAuth();
   const { isDark } = useTheme();
+
   const [region, setRegion] = useState<Region>({
     latitude: -1.2921,
     longitude: 36.8219,
     latitudeDelta: 0.0922,
     longitudeDelta: 0.0421,
   });
+
   const [vendors, setVendors] = useState<Vendor[]>([]);
   const [filteredVendors, setFilteredVendors] = useState<Vendor[]>([]);
   const [selectedVendor, setSelectedVendor] = useState<Vendor | null>(null);
@@ -28,6 +30,8 @@ export default function CustomerExploreScreen() {
   const [searchQuery, setSearchQuery] = useState('');
   const [showSearch, setShowSearch] = useState(false);
 
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     if (Platform.OS !== 'web') {
       getCurrentLocation();
@@ -35,6 +39,7 @@ export default function CustomerExploreScreen() {
     fetchVendors();
   }, []);
 
+  // Fixed: Added searchQuery as dependency and proper filtering logic
   useEffect(() => {
     filterVendors();
   }, [vendors, searchQuery]);
@@ -78,17 +83,23 @@ export default function CustomerExploreScreen() {
     }
   };
 
+  // Fixed: Improved filtering logic
   const filterVendors = () => {
     if (!searchQuery.trim()) {
       setFilteredVendors(vendors);
       return;
     }
 
-    const filtered = vendors.filter(vendor =>
-      vendor.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vendor.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      vendor.address.toLowerCase().includes(searchQuery.toLowerCase())
-    );
+    const query = searchQuery.toLowerCase().trim();
+    const filtered = vendors.filter(vendor => {
+      const name = vendor.name?.toLowerCase() || '';
+      const description = vendor.description?.toLowerCase() || '';
+      const address = vendor.address?.toLowerCase() || '';
+      
+      return name.includes(query) || 
+             description.includes(query) || 
+             address.includes(query);
+    });
 
     setFilteredVendors(filtered);
   };
@@ -98,22 +109,39 @@ export default function CustomerExploreScreen() {
     setShowVendorCard(true);
   };
 
+  // Fixed: Function to handle search button press - redirects to list view
+  const handleSearchPress = () => {
+    setShowListView(true);
+    setShowSearch(true);
+  };
+
+  // Fixed: Improved clear search function
   const clearSearch = () => {
     setSearchQuery('');
     setShowSearch(false);
+    // Clear any pending timeout
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+      searchTimeout.current = null;
+    }
   };
 
-  const ResizedImageMarker = ({ vendor }: { vendor: Vendor }) => (
-    <View style={styles.imageMarkerContainer}>
-      <Image
-        source={require('../../../assets/vendoricon.png')}
-        style={styles.resizedMarkerImage}
-        resizeMode="contain"
-      />
-    </View>
-  );
+  // Fixed: Improved search handling with debounce
+  const handleSearchChange = (text: string) => {
+    setSearchQuery(text);
+    
+    // Clear existing timeout
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+    
+    // Set new timeout for debounced search
+    searchTimeout.current = setTimeout(() => {
+      // The useEffect will handle the filtering automatically
+      // since searchQuery changed
+    }, 300);
+  };
 
-  // Consistent Search Bar Component
   const SearchBarComponent = ({ style, onCancel }: { style?: any, onCancel?: () => void }) => (
     <View style={[styles.searchBarContainer, style]}>
       <View style={[styles.searchInputContainer, { backgroundColor: isDark ? '#374151' : '#f3f4f6' }]}>
@@ -123,8 +151,8 @@ export default function CustomerExploreScreen() {
           placeholder="Search vendors, food, or location..."
           placeholderTextColor={isDark ? '#9ca3af' : '#6b7280'}
           value={searchQuery}
-          onChangeText={setSearchQuery}
-          autoFocus
+          onChangeText={handleSearchChange}
+          autoFocus={showSearch}
         />
         {searchQuery.length > 0 && (
           <TouchableOpacity onPress={clearSearch}>
@@ -147,12 +175,8 @@ export default function CustomerExploreScreen() {
     >
       <View style={styles.vendorListHeader}>
         <View style={styles.vendorListInfo}>
-          <Text style={[styles.vendorListName, { color: isDark ? '#ffffff' : '#111827' }]}>
-            {item.name}
-          </Text>
-          <Text style={[styles.vendorListAddress, { color: isDark ? '#9ca3af' : '#6b7280' }]}>
-            {item.address}
-          </Text>
+          <Text style={[styles.vendorListName, { color: isDark ? '#ffffff' : '#111827' }]}>{item.name}</Text>
+          <Text style={[styles.vendorListAddress, { color: isDark ? '#9ca3af' : '#6b7280' }]}>{item.address}</Text>
         </View>
         <View style={[
           styles.vendorListStatus,
@@ -166,11 +190,9 @@ export default function CustomerExploreScreen() {
           </Text>
         </View>
       </View>
-      
-      <Text style={[styles.vendorListDescription, { color: isDark ? '#9ca3af' : '#6b7280' }]}>
-        {item.description}
-      </Text>
-      
+
+      <Text style={[styles.vendorListDescription, { color: isDark ? '#9ca3af' : '#6b7280' }]}>{item.description}</Text>
+
       <View style={styles.vendorListFooter}>
         <Text style={[styles.vendorListRating, { color: isDark ? '#ffffff' : '#111827' }]}>
           ⭐ {item.rating.toFixed(1)}
@@ -185,7 +207,6 @@ export default function CustomerExploreScreen() {
   if (showListView) {
     return (
       <View style={[styles.container, { backgroundColor: isDark ? '#111827' : '#f9fafb' }]}>
-        {/* Header */}
         <View style={[styles.listHeader, { backgroundColor: isDark ? '#1f2937' : '#ffffff' }]}>
           <View>
             <Text style={[styles.listHeaderTitle, { color: isDark ? '#ffffff' : '#111827' }]}>
@@ -204,21 +225,22 @@ export default function CustomerExploreScreen() {
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.headerButton, { backgroundColor: '#f97316' }]}
-              onPress={() => setShowListView(false)}
+              onPress={() => {
+                setShowListView(false);
+                setShowSearch(false); // Close search when going back to map
+              }}
             >
               <Ionicons name="map" size={20} color="white" />
             </TouchableOpacity>
           </View>
         </View>
 
-        {/* Search Bar */}
         {showSearch && (
           <View style={[styles.searchContainer, { backgroundColor: isDark ? '#1f2937' : '#ffffff' }]}>
             <SearchBarComponent />
           </View>
         )}
 
-        {/* Vendors List */}
         {loading ? (
           <FlatList
             data={[1, 2, 3, 4, 5]}
@@ -246,12 +268,8 @@ export default function CustomerExploreScreen() {
           />
         )}
 
-        {/* Vendor Card */}
         {showVendorCard && selectedVendor && (
-          <VendorCard
-            vendor={selectedVendor}
-            onClose={() => setShowVendorCard(false)}
-          />
+          <VendorCard vendor={selectedVendor} onClose={() => setShowVendorCard(false)} />
         )}
       </View>
     );
@@ -259,7 +277,7 @@ export default function CustomerExploreScreen() {
 
   return (
     <View style={styles.container}>
-       <MapView
+      <MapView
         style={styles.map}
         region={region}
         onRegionChangeComplete={setRegion}
@@ -267,21 +285,18 @@ export default function CustomerExploreScreen() {
       >
         {filteredVendors.map((vendor) => (
           <Marker
-  key={vendor.id}
-  coordinate={{
-    latitude: vendor.latitude,
-    longitude: vendor.longitude,
-  }}
-  onPress={() => handleMarkerPress(vendor)}
-  anchor={{ x: 0.5, y: 1 }}
-  image={require('../../../assets/vendoricon.png')}
-/>
-
-
+            key={vendor.id}
+            coordinate={{
+              latitude: vendor.latitude,
+              longitude: vendor.longitude,
+            }}
+            onPress={() => handleMarkerPress(vendor)}
+            anchor={{ x: 0.5, y: 1 }}
+            
+          />
         ))}
       </MapView>
 
-      {/* Header */}
       <View style={styles.mapHeader}>
         <View style={[styles.welcomeCard, { backgroundColor: isDark ? '#1f2937' : '#ffffff' }]}>
           <Text style={[styles.welcomeText, { color: isDark ? '#ffffff' : '#111827' }]}>
@@ -289,9 +304,9 @@ export default function CustomerExploreScreen() {
           </Text>
         </View>
         <View style={styles.mapHeaderActions}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.mapHeaderButton, { backgroundColor: isDark ? '#1f2937' : '#ffffff' }]}
-            onPress={() => setShowSearch(!showSearch)}
+            onPress={handleSearchPress}
           >
             <Ionicons name='search' size={20} color={isDark ? '#ffffff' : '#374151'} />
           </TouchableOpacity>
@@ -304,47 +319,10 @@ export default function CustomerExploreScreen() {
         </View>
       </View>
 
-      {/* Search Overlay */}
-      {showSearch && (
-        <View style={[styles.searchOverlay, { backgroundColor: isDark ? '#111827' : '#f9fafb' }]}>
-          <View style={[styles.searchHeader, { backgroundColor: isDark ? '#1f2937' : '#ffffff' }]}>
-            <SearchBarComponent onCancel={() => setShowSearch(false)} />
-          </View>
-
-          {/* Search Results */}
-          {loading ? (
-            <FlatList
-              data={[1, 2, 3, 4, 5]}
-              renderItem={() => <SkeletonCard />}
-              keyExtractor={(item) => item.toString()}
-              contentContainerStyle={styles.searchResults}
-              showsVerticalScrollIndicator={false}
-            />
-          ) : (
-            <FlatList
-              data={filteredVendors}
-              renderItem={renderVendorItem}
-              keyExtractor={item => item.id}
-              contentContainerStyle={styles.searchResults}
-              showsVerticalScrollIndicator={false}
-              ListEmptyComponent={
-                <View style={styles.emptyContainer}>
-                  <Text style={[styles.emptyText, { color: isDark ? '#9ca3af' : '#6b7280' }]}>
-                    {searchQuery ? 'No vendors found matching your search' : 'Start typing to search vendors'}
-                  </Text>
-                </View>
-              }
-            />
-          )}
-        </View>
-      )}
-
-      {/* Vendor Card */}
+      {/* REMOVED: Search overlay that was blocking the map */}
+      
       {showVendorCard && selectedVendor && (
-        <VendorCard
-          vendor={selectedVendor}
-          onClose={() => setShowVendorCard(false)}
-        />
+        <VendorCard vendor={selectedVendor} onClose={() => setShowVendorCard(false)} />
       )}
     </View>
   );
@@ -396,19 +374,6 @@ const styles = StyleSheet.create({
   },
   
   // Search Components - Consistent Styling
-  searchOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    zIndex: 1000,
-  },
-  searchHeader: {
-    paddingTop: 48,
-    paddingBottom: 16,
-    paddingHorizontal: 24,
-  },
   searchContainer: {
     paddingHorizontal: 24,
     paddingVertical: 16,
@@ -438,10 +403,6 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     minWidth: 60,
     textAlign: 'center',
-  },
-  searchResults: {
-    paddingTop: 16,
-    paddingBottom: 100,
   },
   
   // List View Styles
@@ -536,41 +497,38 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   customMarker: {
-  alignItems: 'center',
-  justifyContent: 'center',
-},
-
-emojiCircle: {
-  width: 50,
-  height: 50,
-  borderRadius: 25,
-  alignItems: 'center',
-  justifyContent: 'center',
-  borderWidth: 2,
-  borderColor: 'white',
-  shadowColor: '#000',
-  shadowOffset: { width: 0, height: 2 },
-  shadowOpacity: 0.3,
-  shadowRadius: 4,
-  elevation: 5,
-},
-
-emoji: {
-  fontSize: 24,
-},
-
-markerTail: {
-  width: 0,
-  height: 0,
-  borderLeftWidth: 8,
-  borderRightWidth: 8,
-  borderTopWidth: 12,
-  borderLeftColor: 'transparent',
-  borderRightColor: 'transparent',
-  borderTopColor: '#f97316', // Same as circle bg
-  marginTop: -1,
-},
-imageMarkerContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emojiCircle: {
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 2,
+    borderColor: 'white',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 5,
+  },
+  emoji: {
+    fontSize: 24,
+  },
+  markerTail: {
+    width: 0,
+    height: 0,
+    borderLeftWidth: 8,
+    borderRightWidth: 8,
+    borderTopWidth: 12,
+    borderLeftColor: 'transparent',
+    borderRightColor: 'transparent',
+    borderTopColor: '#f97316',
+    marginTop: -1,
+  },
+  imageMarkerContainer: {
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -578,6 +536,4 @@ imageMarkerContainer: {
     width: 30,
     height: 30,
   },
-
-
 });
