@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
 import { View, TextInput, TouchableOpacity, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { FloatingLabelInputProps } from '@/types';
+import { FloatingLabelInputProps } from '../types';
 
 const FloatingLabelInput: React.FC<FloatingLabelInputProps> = ({
   label,

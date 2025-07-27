@@ -3,7 +3,7 @@ import { useTheme } from '../contexts/ThemeContext';
 import { useState, useEffect } from 'react';
 import { supabase, useAuth } from '../contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
-import { Vendor, Food } from '@/types';
+import { Vendor, Food } from '../types';
 import Loader from '@/components/Loader';
 import AlertBox from '@/components/AlertBox'; // Add this import
 

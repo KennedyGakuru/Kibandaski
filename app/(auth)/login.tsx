@@ -5,7 +5,7 @@ import { router } from 'expo-router';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useAuth } from '../../contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
-import { FloatingLabelInputProps } from '@/types';
+//import { FloatingLabelInputProps } from '@/types';
 import AlertBox from '../../components/AlertBox';
 import FloatingLabelInput from '@/components/FloatingLabelInput';
 

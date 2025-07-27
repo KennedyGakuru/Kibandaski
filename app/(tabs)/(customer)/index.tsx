@@ -8,7 +8,7 @@ import { VendorCard } from '../../../components/VendorCard';
 import { SkeletonCard } from '../../../components/SkeletonCard';
 import { supabase } from '../../../contexts/AuthContext';
 import { Ionicons } from '@expo/vector-icons';
-import { Vendor } from '@/types';
+import { Vendor } from '../../../types';
 
 export default function CustomerExploreScreen() {
   const { user } = useAuth();
